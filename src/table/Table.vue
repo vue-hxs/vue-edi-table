@@ -43,8 +43,8 @@
           <td
             v-for="(header, field, coli) in headers"
             v-if="header.visible != false"
-            @click="cellClick($event, rowi,field)"
-            @dblclick="cellDblClick($event, rowi,field)"
+            @click="cellClick"
+            @dblclick="cellDblClick"
             :class="{active:state.cursor.rowi == rowi && state.cursor.coli == coli}"
             :data-field="field"
             :key ="field">

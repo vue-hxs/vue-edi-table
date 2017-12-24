@@ -33,16 +33,9 @@
 #table2 .editor .input {
   display: flex;
   justify-content: center;
-}
-
-#table2 .editor .input {
   text-align: center;
   width: 100%;
   height: 100%;
-}
-
-#table2 table td:hover {
-  background: rgba(150, 150, 150, 0.1);
 }
 
 /*
@@ -53,11 +46,19 @@
 }
  */
 
-#table2 table tr.modified {
+#table2 table td:hover {
+  background: rgba(150, 150, 150, 0.1);
+}
+
+#table2 table tr.modified > td {
   font-weight: bold;
   background: rgba(200, 200, 200, 0.2);
 }
 
-#table2 table .indexes tr.modified th::before {
+#table2 table tr.selected > td {
+  background: rgba(230, 230, 255, 0.9);
+}
+
+#table2 table .indexes tr.modified td::before {
   content: "*";
 }

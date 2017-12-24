@@ -138,7 +138,6 @@ export default {
           return
         }
         // move selection and blur whatever is focused
-        console.log('rel:', dir)
         // check if we can select further
         this.moveCursor(dir[0], dir[1], true)
         e.preventDefault()
@@ -159,10 +158,8 @@ export default {
       }
     },
     scrollEvent (e) {
-      this.doScroll(e.target.scrollLeft, e.target.scrollTop)
-      return
-      scrollLeft = e.target.scrollLeft
-      scrollTop = e.target.scrollTop
+      scrollLeft = e.currentTarget.scrollLeft
+      scrollTop = e.currentTarget.scrollTop
 
       if (!scrollTicking) {
         window.requestAnimationFrame(() => {
@@ -227,16 +224,15 @@ export default {
     },
 
     // cellSelection
-    cellClick (e, rowi, field) {
+    cellClick (e) {
       if (this.state.cursor.editing) {
         return
       }
-      // if not a TD ignore
       const el = e.currentTarget
       this.setCursor(el.cellIndex, el.parentElement.sectionRowIndex)
       // but if cursor is same, we start edit on double click?
     },
-    cellDblClick (e, rowi, field) {
+    cellDblClick (e) {
       if (this.state.cursor.editing) {
         e.preventDefault()
         return
@@ -247,8 +243,32 @@ export default {
       this.editStart()
       // Start edit the cell
     },
-    rowSelection (rowi) { // Add
-      this.state.rows[rowi].selected = 1
+    rowClick (e, rowi) { // Add
+      // Deselect if found
+      var found = this.state.selectedRows.indexOf(this.state.rows[rowi])
+      if (found !== -1 && (e.ctrlKey || this.state.selectedRows.length === 1)) { // deselect one
+        this.state.selectedRows[found].selected = false
+        this.state.selectedRows.splice(found, 1)
+        return
+      }
+      if (!e.ctrlKey) {
+        this.deselectAll()
+      }
+      this.state.selectedRows.push(this.state.rows[rowi])
+      // Add row to selectionList
+
+      console.log('Selecting row:', rowi)
+      this.state.rows[rowi].selected = true
+
+      this.$forceUpdate()
+      // Why not reactive
+    },
+    deselectAll () {
+      console.log('Deselecting all')
+      for (let row of this.state.selectedRows) {
+        row.selected = false
+      }
+      this.state.selectedRows = []
     },
     // Set the cell/multicell cursor or disable cursor if no arguments
     setCursor (coli, rowi) {

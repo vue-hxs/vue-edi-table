@@ -74,6 +74,7 @@
   overflow-y: hidden;
   left: 0;
   top: var(--header-height);
+  user-select: none;
 
   /* bottom: var(--scroll-offset); */
   max-height: calc(100% - var(--header-height) - var(--scroll-offset));
@@ -92,8 +93,12 @@
   max-height: calc(100% - var(--header-height));
 }
 
-#table2 table td.active {
+#table2:focus table td.active {
   border: solid 2px #f00;
+}
+
+#table2 table td.active {
+  border: solid 2px rgba(250, 0, 0, 0.2);
 }
 
 #table2 .editor {

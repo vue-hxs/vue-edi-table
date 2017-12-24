@@ -9,6 +9,10 @@ Row selection/ Save/delete button
 
 Implement history set like other editable
 
-* Delete
-* New
-* Change
+TODO:
+
+* [ ] Delete
+* [ ] New
+* [x] Change
+* [x] Row selection
+* [ ] Selection shift
