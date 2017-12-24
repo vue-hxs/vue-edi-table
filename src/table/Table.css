@@ -1,0 +1,166 @@
+:root {
+  --row-height: 40px;
+  --header-height: 30px;
+  --index-width: 30px;
+  --scroll-offset: 12px;
+}
+
+/* testing the thing */
+
+/* fill whatever parent is */
+#table2 {
+  height: 100%;
+  min-height: 400px;
+}
+
+#table2 table {
+  min-height: 400px;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  box-sizing: border-box;
+}
+
+#table2 table tr {
+  height: var(--row-height);
+  display: flex;
+  flex-flow: row;
+  min-width: fit-content;
+}
+
+#table2 table tr > td,
+#table2 table tr > th {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+}
+
+#table2 table tr > td {
+  border: solid 2px transparent;
+}
+
+#table2 table > thead,
+#table2 table > tfoot {
+  position: absolute;
+  z-index: 10;
+}
+
+#table2 table tfoot td,
+#table2 table thead th {
+  font-weight: normal;
+  align-items: center;
+  justify-content: center;
+}
+
+#table2 table > .header > tr > th,
+#table2 table > tbody > tr > td {
+  min-width: 200px;
+}
+
+#table2 table .header {
+  overflow-x: hidden;
+  top: 0;
+  right: var(--scroll-offset);
+  left: var(--index-width);
+}
+
+#table2 table .header > tr {
+  height: var(--header-height);
+}
+
+/* indexes thing */
+#table2 table .indexes {
+  overflow-y: hidden;
+  left: 0;
+  top: var(--header-height);
+
+  /* bottom: var(--scroll-offset); */
+  max-height: calc(100% - var(--header-height) - var(--scroll-offset));
+}
+
+#table2 table .indexes > tr {
+  width: var(--index-width);
+}
+
+#table2 table tbody {
+  position: absolute;
+  top: var(--header-height);
+  right: 0;
+  left: var(--index-width);
+  overflow: scroll;
+  max-height: calc(100% - var(--header-height));
+}
+
+#table2 table td.active {
+  border: solid 2px #f00;
+}
+
+#table2 .editor {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  display: none;
+  box-shadow: 0 4px 20px rgba(50, 50, 50, 0.3);
+  z-index: 20;
+}
+
+#table2 .editor.editing {
+  display: block;
+}
+
+/* Input thing */
+#table2 .editor > .input {
+  box-sizing: border-box;
+  outline: none;
+  background: transparent;
+  resize: unset;
+  font-family: inherit;
+  font-size: inherit;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* #table2 .cursor {
+  box-sizing: border-box;
+  position: absolute;
+  display: none;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+
+}
+
+#table2 .cursor .edit {
+  box-sizing: border-box;
+  pointer-events: all;
+  display: none;
+
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+}
+
+#table2 .cursor .edit input {
+  }
+
+#table2 .cursor.editing .edit {
+  display: block;
+}*/
+
+/* inputs inside td */
+#table2 table tbody td > * {
+  overflow: hidden;
+  border: none;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  resize: unset;
+  font-family: inherit;
+  font-size: inherit;
+  z-index: 20;
+}

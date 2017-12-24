@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>thing</title>
+		<style>
+			.outer {
+				overflow:auto;
+				border: solid 1px #F00;
+				width:300px;
+				height:300px;
+			}
+			.inner { 
+				border: solid 1px #FF0;
+				width:600px;
+				height:600px;
+			}
+		</style>
+		<script>
+			window.onload = function() {
+				var outer = document.querySelector(".outer")
+				outer.addEventListener("scroll", function(e) {
+					console.log("Scrolling",e)
+					console.log("scroll:",e.target.scrollTop)
+					document.getElementById('scrollTop').innerHTML = e.target.scrollTop;
+				})
+			}
+		</script>
+	</head>
+	<body>
+		<h1>Goal simulate a scroll</h1>
+		<div id="scrollTop"></div>
+		<div class="outer">
+			<div class="inner">
+			</div>
+		</div>
+		
+
+
+
+	</body>
+</html>

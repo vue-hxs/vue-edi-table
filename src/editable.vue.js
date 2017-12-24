@@ -43,7 +43,7 @@ export default {
       this.historySet = []
     }
   },
-  mounted () { // Cache elements
+  mounted () { // Cache elements?
     // this.selElement = this.$el.querySelector('#selection')
     var relEl = this.$refs.selection
     while (true) { // Find relative parent

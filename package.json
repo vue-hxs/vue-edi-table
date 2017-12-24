@@ -1,17 +1,18 @@
 {
   "name": "vue-edi-table",
   "description": "Editable table",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "main": "dist/vue-edi-table.js",
   "author": "luis <luisf@hexasoftware.com>",
   "license": "MIT",
-  "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "build-demo": "cross-env NODE_ENV=development webpack --progress --hide-modules"
   },
   "dependencies": {
-    "vue": "^2.4.4"
+    "vue": "^2.4.4",
+    "vue-split-layout": "^0.0.6"
   },
   "browserslist": [
     "> 1%",
@@ -25,6 +26,13 @@
     "babel-preset-stage-3": "^6.24.1",
     "cross-env": "^5.0.5",
     "css-loader": "^0.28.7",
+    "eslint": "^4.13.1",
+    "eslint-config-node": "^2.0.0",
+    "eslint-config-standard": "^11.0.0-beta.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "eslint-plugin-vue": "^4.0.0-beta.2",
     "file-loader": "^1.1.4",
     "html-webpack-plugin": "^2.30.1",
     "node-sass": "^4.7.2",
@@ -32,13 +40,6 @@
     "vue-loader": "^13.0.5",
     "vue-template-compiler": "^2.4.4",
     "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.9.1",
-    "eslint": "^4.13.1",
-    "eslint-config-node": "^2.0.0",
-    "eslint-config-standard": "^11.0.0-beta.0",
-    "eslint-plugin-node": "^5.2.1",
-    "eslint-plugin-promise": "^3.6.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "eslint-plugin-vue": "^4.0.0-beta.2"
+    "webpack-dev-server": "^2.9.1"
   }
 }

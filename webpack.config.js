@@ -46,7 +46,7 @@ module.exports = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js'
     },
-    extensions: ['*', '.js', '.vue', '.json', '.jsx']
+    extensions: ['.vue', '*', '.js', '.json', '.jsx']
   },
   devServer: {
     host: '0.0.0.0',
@@ -67,7 +67,8 @@ if (process.env.NODE_ENV === 'development') {
     entry: './demo/main.js',
     output: {
       path: path.resolve(__dirname, './docs'),
-      publicPath: '/vue-edi-table/',
+      // publicPath: '/vue-edi-table/',
+      publicPath: '/',
       filename: 'index.js'
     }
   })
