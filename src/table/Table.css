@@ -11,16 +11,29 @@
 #table2 {
   height: 100%;
   min-height: 400px;
+  display: flex;
+  flex-flow: column;
 }
 
 #table2 table {
   min-height: 400px;
   width: 100%;
-  height: 100%;
+  display: flex;
   position: relative;
   box-sizing: border-box;
+  flex: 1;
 }
 
+#table2 table .corner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  width: var(--index-width);
+  height: var(--header-height);
+}
+
+/* we might have a table inside */
 #table2 table tr {
   height: var(--row-height);
   display: flex;
@@ -28,26 +41,25 @@
   min-width: fit-content;
 }
 
-#table2 table tr > td,
-#table2 table tr > th {
+#table2 table > tbody > tr > td {
   flex: 1;
   overflow: hidden;
   display: flex;
   align-items: flex-start;
 }
 
-#table2 table tr > td {
-  border: solid 2px transparent;
-}
-
 #table2 table > thead,
 #table2 table > tfoot {
+  overflow: hidden;
   position: absolute;
   z-index: 10;
 }
 
-#table2 table tfoot td,
-#table2 table thead th {
+#table2 table .corner,
+#table2 table .indexes td,
+#table2 table th {
+  flex: 1;
+  display: flex;
   font-weight: normal;
   align-items: center;
   justify-content: center;
@@ -55,22 +67,23 @@
 
 #table2 table > .header > tr > th,
 #table2 table > tbody > tr > td {
+  position: relative;
   min-width: 200px;
 }
 
-#table2 table .header {
+#table2 table > .header {
   overflow-x: hidden;
   top: 0;
   right: var(--scroll-offset);
   left: var(--index-width);
 }
 
-#table2 table .header > tr {
+#table2 table > .header > tr {
   height: var(--header-height);
 }
 
 /* indexes thing */
-#table2 table .indexes {
+#table2 table > .indexes {
   overflow-y: hidden;
   left: 0;
   top: var(--header-height);
@@ -80,7 +93,7 @@
   max-height: calc(100% - var(--header-height) - var(--scroll-offset));
 }
 
-#table2 table .indexes > tr {
+#table2 table > .indexes > tr {
   width: var(--index-width);
 }
 
@@ -93,12 +106,19 @@
   max-height: calc(100% - var(--header-height));
 }
 
-#table2:focus table td.active {
-  border: solid 2px #f00;
+#table2 table td.active::after {
+  content: " ";
+  z-index: 30;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: solid 2px rgba(250, 0, 0, 0.2);
 }
 
-#table2 table td.active {
-  border: solid 2px rgba(250, 0, 0, 0.2);
+#table2 table:focus td.active::after {
+  border: solid 2px #f00;
 }
 
 #table2 .editor {
@@ -120,6 +140,7 @@
   outline: none;
   background: transparent;
   resize: unset;
+  color: inherit;
   font-family: inherit;
   font-size: inherit;
   border: none;
@@ -157,7 +178,7 @@
   display: block;
 }*/
 
-/* inputs inside td */
+/* anything inside a td  (usually inputs) */
 #table2 table tbody td > * {
   overflow: hidden;
   border: none;
@@ -168,4 +189,8 @@
   font-family: inherit;
   font-size: inherit;
   z-index: 20;
+}
+
+#table2 table tbody td > .readonly {
+  pointer-events: none;
 }

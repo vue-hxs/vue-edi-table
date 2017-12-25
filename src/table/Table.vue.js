@@ -1,4 +1,5 @@
-import _ from 'lodash'
+// import _ from 'lodash'
+import DataList from './dataList'
 
 /*
 --row-height: 40px;
@@ -24,6 +25,7 @@ var scrollLeft = 0
 var scrollTicking = false
 
 export default {
+  mixins: [DataList],
   props: {
     'headers': {type: Object, default: {}},
     'rows': {type: Array, default: []},
@@ -37,6 +39,10 @@ export default {
       editable: true,
 
       state: {
+        scroll: {
+          top: 0,
+          left: 0
+        },
         cursor: {
           rowi: 0,
           coli: 0,
@@ -44,19 +50,9 @@ export default {
           value: ''
         },
 
-        headers: this.headers,
-        rows: this.transformRows(this.rows),
-        selectedRows: [],
-        historySet: []
+        headers: this.headers
       }
     }
-  },
-  watch: {
-    rows (val, oldVal) {
-      this.state.rows = this.transformRows(val)
-    }
-  },
-  computed: {
   },
   // Define some styling here?
   mounted () {
@@ -67,20 +63,12 @@ export default {
     this.$el.style.setProperty('--index-width', this.indexWidth)
 
     this.$el.style.setProperty('--scroll-offset', scrollSize + 'px')
-    this.setCursor() // nothing
+    this.cursorSet() // nothing
 
     // this.$el.addEventListener('keydown', this.keyEvent.bind(this))
     // document.addEventListener('keydown', this.keyEvent.bind(this))
   },
   methods: {
-    nullEvt (e) { // Direct input
-      e.preventDefault()
-      e.stopPropagation()
-      return false
-    },
-    transformRows (rows) {
-      return rows.map(row => { return {data: _.cloneDeep(row)} })
-    },
     editorStyle () {
       const {coli, rowi} = this.state.cursor
       if (!this.state.cursor.editing) {
@@ -101,6 +89,7 @@ export default {
     },
 
     keyEvent (e) {
+      console.log('Key down')
       if (this.editable === false) {
         return
       }
@@ -111,15 +100,15 @@ export default {
         let dir = 1
         if (e.shiftKey) dir = -1
         this.$nextTick(() => {
-          this.moveCursor(dir, 0, true)
+          this.cursorMove(dir, 0, true)
         })
+        return
       }
       if (e.key === 'Enter') {
         if (this.state.cursor.editing) {
-          console.log('Bluring and move down')
           this.$refs.input.blur() // Stop editing somehow
           this.$nextTick(() => {
-            this.moveCursor(0, 1)
+            this.cursorMove(0, 1)
           })
         } else {
           this.editStart()
@@ -129,7 +118,8 @@ export default {
         if (this.state.cursor.editing) {
           return
         }
-        this.state.rows[this.state.cursor.rowi].data[this.state.cursor.field] = ''
+        this.rowChange(this.state.cursor.rowi, this.state.cursor.field, '')
+        // this.state.rows[this.state.cursor.rowi].data[this.state.cursor.field] = ''
       }
 
       let dir = arrow[e.key]
@@ -139,7 +129,7 @@ export default {
         }
         // move selection and blur whatever is focused
         // check if we can select further
-        this.moveCursor(dir[0], dir[1], true)
+        this.cursorMove(dir[0], dir[1], true)
         e.preventDefault()
         return
       }
@@ -175,26 +165,20 @@ export default {
       this.$refs.indexes.scrollTop = top
       this.$refs.header.scrollLeft = left
 
-      // Make css how of this by changing classes
-      /* if (e.target.scrollTop > 0) {
-        this.$refs.header.style['box-shadow'] = '0px 2px 2px rgba(10,10,10,0.4)'
-      } else {
-        this.$refs.header.style['box-shadow'] = 'none'
-      }
-      if (e.target.scrollLeft > 0) {
-        this.$refs.indexes.style['box-shadow'] = '2px 0px 2px rgba(10,10,10,0.4)'
-      } else {
-        this.$refs.indexes.style['box-shadow'] = 'none'
-      } */
+      this.state.scroll.top = top
+      this.state.scroll.left = left
     },
     editStart () {
+      var {rowi, field} = this.state.cursor
+      if (this.state.headers[field].readonly) {
+        return
+      }
       this.state.cursor.editing = true
 
       //
-      var {rowi, field} = this.state.cursor
       this.state.cursor.value = this.state.rows[rowi].data[field]
       this.$nextTick(() => {
-        // Reposition the thing here
+        // Reposition the thing here computed would be better?
         var lstyle = this.editorStyle()
         for (var k in lstyle) {
           this.$refs.editor.style[k] = lstyle[k]
@@ -206,30 +190,25 @@ export default {
     editStop (e) { // or Blur
       this.state.cursor.editing = false
 
-      var lstyle = this.editorStyle()
-      for (var k in lstyle) {
-        this.$refs.editor.style[k] = lstyle[k]
-      }
+      this.$nextTick(() => {
+        var lstyle = this.editorStyle()
+        for (var k in lstyle) {
+          this.$refs.editor.style[k] = lstyle[k]
+        }
 
-      // commit changes
-      const {rowi, field} = this.state.cursor
-
-      // Deep clone
-      var oldRow = _.cloneDeep(this.state.rows[rowi]) // Save current
-      this.state.rows[rowi].data[field] = this.state.cursor.value // set new value
-      // Mark modifiedj
-      this.state.rows[rowi].modified = true // Set as modified
-      this.state.historySet.push({op: 'update', row: this.rows[rowi], index: rowi, oldRow: oldRow})
-      this.$el.focus() // Back to parent focus
+        // commit changes
+        const {rowi, field} = this.state.cursor
+        this.rowChange(rowi, field, this.state.cursor.value)
+        this.$refs.table.focus() // Back to parent focus
+      })
     },
-
     // cellSelection
     cellClick (e) {
       if (this.state.cursor.editing) {
         return
       }
       const el = e.currentTarget
-      this.setCursor(el.cellIndex, el.parentElement.sectionRowIndex)
+      this.cursorSet(el.cellIndex, el.parentElement.sectionRowIndex)
       // but if cursor is same, we start edit on double click?
     },
     cellDblClick (e) {
@@ -238,40 +217,40 @@ export default {
         return
       }
       const el = e.currentTarget
-      this.setCursor(el.cellIndex, el.parentElement.sectionRowIndex)
+      this.cursorSet(el.cellIndex, el.parentElement.sectionRowIndex)
 
       this.editStart()
       // Start edit the cell
     },
-    rowClick (e, rowi) { // Add
-      // Deselect if found
-      var found = this.state.selectedRows.indexOf(this.state.rows[rowi])
-      if (found !== -1 && (e.ctrlKey || this.state.selectedRows.length === 1)) { // deselect one
-        this.state.selectedRows[found].selected = false
-        this.state.selectedRows.splice(found, 1)
+
+    // This could be in history
+    // Possible improve this into dataList.js
+    rowClick (e, rowi) {
+      if (e.shiftKey && this.state.selection.last !== null) {
+        this.rowDeselectAll()
+        // selectRange
+        let start = rowi
+        let end = this.state.selection.last
+        this.rowSelectRange(start, end)
+        this.$forceUpdate()
+        return
+      }
+      // Deselect if found is selected
+      var found = this.state.selection.rows.indexOf(this.state.rows[rowi])
+      if (found !== -1 && (e.ctrlKey || this.state.selection.rows.length === 1)) { // deselect one
+        this.rowSelect(found, false)
         return
       }
       if (!e.ctrlKey) {
-        this.deselectAll()
+        this.rowDeselectAll()
       }
-      this.state.selectedRows.push(this.state.rows[rowi])
-      // Add row to selectionList
+      this.rowSelect(rowi, true)
 
-      console.log('Selecting row:', rowi)
-      this.state.rows[rowi].selected = true
-
-      this.$forceUpdate()
       // Why not reactive
-    },
-    deselectAll () {
-      console.log('Deselecting all')
-      for (let row of this.state.selectedRows) {
-        row.selected = false
-      }
-      this.state.selectedRows = []
+      this.$forceUpdate()
     },
     // Set the cell/multicell cursor or disable cursor if no arguments
-    setCursor (coli, rowi) {
+    cursorSet (coli, rowi) {
       this.state.cursor.rowi = rowi
       this.state.cursor.coli = coli
       if (rowi === undefined && coli === undefined) {
@@ -285,14 +264,10 @@ export default {
       cellEl.focus()
       cellEl.removeAttribute('contenteditable')
 
-      // Oddly setting this manually
-      /* var lstyle = this.cursorStyle()
-      for (var k in lstyle) {
-        this.$refs.cursor.style[k] = lstyle[k]
-      } */
-      this.$el.focus()
+      this.$refs.table.focus()
     },
-    moveCursor (colm, rowm, circle) {
+    cursorMove (colm, rowm, circle) {
+      // if we have focus, we blur
       let newColi = this.state.cursor.coli + colm
       let newRowi = this.state.cursor.rowi + rowm
 
@@ -315,44 +290,10 @@ export default {
       }
       newColi = limit(newColi, 0, this.$refs.tbody.rows[0].cells.length - 1)
       newRowi = limit(newRowi, 0, this.state.rows.length - 1)
-      this.setCursor(newColi, newRowi)
+      this.cursorSet(newColi, newRowi)
       // Cell Blur and focus
-    },
-    /**
-     * Experimental undo
-     */
-    undoLast () {
-      console.log('Undoing')
-      var change = this.state.historySet.pop()
-      var vindex
-      switch (change.op) {
-        case 'add':
-          vindex = this.state.rows.indexOf(change.row)
-          this.state.rows.splice(vindex, 1) // delete row
-          break
-        case 'update':
-          // vindex = this.rows.indexOf(change.row)
-          this.state.rows[change.index] = change.oldRow
-          break
-        case 'delete':
-          this.state.rows.splice(change.index, 0, change.row)
-          break
-      }
-    },
-    commitChanges () {
-      // build changeSet from history
-      var changeControl = new Map()
-      for (var histItem of this.state.historySet) {
-        changeControl.set(histItem.row, histItem.op)
-      }
-      var changeSet = []
-
-      for (let [row, op] of changeControl) {
-        changeSet.push({op: op, data: row.data})
-      }
-      console.log('final:', changeSet)
-      this.$emit('commit', changeSet)
     }
+
   }
 }
 

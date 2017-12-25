@@ -1,27 +1,30 @@
 <template>
   <div
     id="table2"
-    tabindex="1"
     @keydown="keyEvent">
     <div class="actions">
       <button
         v-if="editable"
         :disabled="state.historySet.length == 0"
         class="primary-inv"
-        @click="commitChanges">save</button>
+        @click="changesCommit">save</button>
       <button
-        v-if="editable && state.selectedRows.length > 0"
-        @click="rowDelete(state.selectedRows)">Delete selected rows</button>
+        v-if="editable && rowHasSelected()"
+        @click="rowDelete(state.selection.rows)">Delete selected rows</button>
       <button
         v-if="state.historySet.length > 0"
-        @click="undoLast">&lt; Undo</button>
+        @click="changesUndo">&lt; Undo</button>
     </div>
 
-    <table ref="table">
+    <table
+      ref="table"
+      tabindex="1"
+      :class="{scrollingTop: state.scroll.top > 0, scrollingLeft: state.scroll.left > 0}">
+      <div class="head corner">#</div>
       <thead
         ref="header"
         class="header">
-        <tr >
+        <tr class="head">
           <th
             :key="k"
             v-for="(header,k) in headers"
@@ -53,14 +56,15 @@
                 <input
                   type="checkbox"
                   :checked="row.data[field]"
-                  @change="nullEvt"
-                  @click="nullEvt"
-                  readonly>
+                  @change="rowChange(rowi,field, $event.target.checked)"
+                  :class="{readonly:state.headers[field].readonly}"
+                >
               </template>
               <template v-else-if="header.type != undefined">
                 <input
                   :type="header.type"
                   :value="row.data[field]"
+                  :class="{readonly:state.headers[field].readonly}"
                   readonly>
               </template>
               <template v-else>
@@ -105,10 +109,10 @@
         class="indexes">
         <tr
           v-for="(row,rowi) in state.rows"
-          :class="{modified: row.modified, selected: row.selected}"
+          :class="{head:true, modified: row.modified, selected: row.selected}"
           :key="rowi"
           @click="rowClick($event,rowi)">
-          <td >
+          <td>
             {{ rowi }}
           </td>
         </tr>
@@ -118,6 +122,10 @@
     <div class="table-debug">
       test:
       {{ state.focus }}
+      <div>
+        <label>HistorySet</label>
+        {{ state.historySet }}
+      </div>
     </div>
 
   </div>

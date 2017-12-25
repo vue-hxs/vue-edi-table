@@ -4,25 +4,24 @@
       <button @click="editable=!editable">editable {{ editable }}</button>
       <input type="text" value="focus test">
     </div>
-    <Layout :resize="true" :splits="splits">
+
+    <Split :resizeable="true" dir="horizontal">
       <div>
         <editable-new
           :headers="columns"
           :rows="dataList"
           :editable="editable"
+          @commit="commit"
           row-height="40px"
-          index-width="40px"
-      /></div>
+          index-width="40px"/>
+      </div>
       <div/>
-      <!--  <div class="old-editable">
-        <!-- old table -->
+      <!--  <div class="old-editable">-->
       <!--<Editable
         :columns="columns"
         :data-list="dataList"
         :editable="editable"/>-->
-    </layout>
-
-    </Layout>
+    </Split>
   </div>
 </template>
 <script>
@@ -37,10 +36,10 @@ export default {
 
     for (let i = 0; i < 50; i++) {
       dataList.push(
-        {name: 'Samsung', model: 'Note 4', active: true, password: '123'},
-        {name: 'Samsung', model: 'Note 5', active: true, password: '123'},
-        {name: 'Apple', model: 'iPhone 4', active: false, password: '123'},
-        {name: 'Apple', model: 'iPhone X', active: true, password: '123'}
+        {id: i * 4 + 1, name: 'Samsung', model: 'Note 4', active: true, password: '123', rdonly: true},
+        {id: i * 4 + 2, name: 'Samsung', model: 'Note 5', active: true, password: '123', rdonly: false},
+        {id: i * 4 + 3, name: 'Apple', model: 'iPhone 4', active: false, password: '123', rdonly: true},
+        {id: i * 4 + 4, name: 'Apple', model: 'iPhone X', active: true, password: '123', rdonly: true}
       )
     }
     return {
@@ -52,12 +51,19 @@ export default {
       },
       editable: true,
       columns: {
+        id: {header: 'Id', text: 'Id', readonly: true},
         name: {header: 'Brands', text: 'Brands'},
         model: {header: 'model', text: 'model'},
         active: {header: 'active', text: 'active', type: 'checkbox'},
-        password: {header: 'Password', text: 'Password', type: 'password'}
+        password: {header: 'Password', text: 'Password', type: 'password'},
+        rdonly: {header: 'Big ass header testing Readonly checkbox', text: 'Big ass header testing Readonly checkbox', type: 'checkbox', readonly: true}
       },
       dataList: dataList
+    }
+  },
+  methods: {
+    commit (c) {
+      console.log('Commiting changes:', c)
     }
   }
 }
