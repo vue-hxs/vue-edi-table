@@ -18,11 +18,10 @@
 </template>
 <script>
 import Editable from '../src'
-import {Editable as EditableOld} from '../src/old'
 import {Split} from 'vue-split-layout'
 
 export default {
-  components: {Editable, EditableOld, Split},
+  components: {Editable, Split},
   data () {
     var dataList = []
 

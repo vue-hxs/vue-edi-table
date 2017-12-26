@@ -6,13 +6,13 @@
     <div class="actions">
       <button
         v-if="editable"
+        @click="rowAddEvent()"
+      >New</button>
+      <button
+        v-if="editable"
         :disabled="state.historySet.length == 0"
         class="primary-inv"
         @click="changesCommit">save</button>
-      <button
-        v-if="editable"
-        @click="rowAddEvent()"
-      >New</button>
       <button
         v-if="editable && rowHasSelected()"
         @click="rowDelete(state.selection.rows)">Delete selected rows</button>

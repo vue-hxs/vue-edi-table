@@ -150,6 +150,18 @@ export default {
       var changeControl = new Map()
       for (var histItem of this.state.historySet) {
         for (var data of histItem.rows) {
+          let op = changeControl.get(data.row)
+          if (op === 'add') { // Special case, merge updates into add
+            switch (histItem.op) {
+              case 'update':
+                changeControl.set(data.row, op)
+                break
+              case 'delete':
+                changeControl.delete(data.row)
+                break
+            }
+            continue
+          }
           changeControl.set(data.row, histItem.op)
         }
       }
@@ -158,7 +170,6 @@ export default {
       for (let [row, op] of changeControl) {
         changeSet.push({op: op, data: row.data})
       }
-      console.log('final:', changeSet)
       this.$emit('commit', changeSet)
     }
 
