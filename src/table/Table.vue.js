@@ -64,9 +64,6 @@ export default {
 
     this.$el.style.setProperty('--scroll-offset', scrollSize + 'px')
     this.cursorSet() // nothing
-
-    // this.$el.addEventListener('keydown', this.keyEvent.bind(this))
-    // document.addEventListener('keydown', this.keyEvent.bind(this))
   },
   methods: {
     editorStyle () {
@@ -77,19 +74,18 @@ export default {
       if (this.$el === undefined || rowi === undefined || coli === undefined) {
         return {display: 'none'}
       }
-      var relRect = this.$refs.tbody.getBoundingClientRect()
-      var rect = this.$refs.tbody.rows[rowi].cells[coli].getBoundingClientRect()
+      var relRect = this.$refs.table.getBoundingClientRect()
+      var rect = this.$refs.tbody.rows[rowi].cells[coli + 1].getBoundingClientRect()
       return {
         display: 'block',
-        left: (rect.left - relRect.left + this.$refs.tbody.scrollLeft) + 'px',
-        top: (rect.top - relRect.top + this.$refs.tbody.scrollTop) + 'px',
+        left: (rect.left - relRect.left + this.$refs.table.scrollLeft) + 'px',
+        top: (rect.top - relRect.top + this.$refs.table.scrollTop) + 'px',
         width: rect.width + 'px',
         height: rect.height + 'px'
       }
     },
 
     keyEvent (e) {
-      console.log('Key down')
       if (this.editable === false) {
         return
       }
@@ -148,25 +144,8 @@ export default {
       }
     },
     scrollEvent (e) {
-      scrollLeft = e.currentTarget.scrollLeft
-      scrollTop = e.currentTarget.scrollTop
-
-      if (!scrollTicking) {
-        window.requestAnimationFrame(() => {
-          this.doScroll(scrollLeft, scrollTop)
-          scrollTicking = false
-        })
-        scrollTicking = true
-      }
-    },
-    // syncScroll
-    doScroll (left, top) {
-      // visual link scrolls
-      this.$refs.indexes.scrollTop = top
-      this.$refs.header.scrollLeft = left
-
-      this.state.scroll.top = top
-      this.state.scroll.left = left
+      this.state.scroll.top = e.currentTarget.scrollTop
+      this.state.scroll.left = e.currentTarget.scrollLeft
     },
     editStart () {
       var {rowi, field} = this.state.cursor
@@ -202,22 +181,24 @@ export default {
         this.$refs.table.focus() // Back to parent focus
       })
     },
-    // cellSelection
-    cellClick (e) {
+    // cellEvents
+    cellClick (e, rowi, coli) {
       if (this.state.cursor.editing) {
         return
       }
-      const el = e.currentTarget
-      this.cursorSet(el.cellIndex, el.parentElement.sectionRowIndex)
+      this.cursorSet(coli, rowi)
       // but if cursor is same, we start edit on double click?
     },
-    cellDblClick (e) {
+    cellChange (rowi, field, value) {
+      this.rowChange(rowi, field, value)
+      this.$refs.table.focus()
+    },
+    cellDblClick (e, rowi, coli) {
       if (this.state.cursor.editing) {
         e.preventDefault()
         return
       }
-      const el = e.currentTarget
-      this.cursorSet(el.cellIndex, el.parentElement.sectionRowIndex)
+      this.cursorSet(coli, rowi)
 
       this.editStart()
       // Start edit the cell
@@ -226,6 +207,9 @@ export default {
     // This could be in history
     // Possible improve this into dataList.js
     rowClick (e, rowi) {
+      e.preventDefault()
+      e.stopPropagation()
+
       if (e.shiftKey && this.state.selection.last !== null) {
         this.rowDeselectAll()
         // selectRange
@@ -257,14 +241,39 @@ export default {
         return
       }
 
-      var cellEl = this.$refs.tbody.rows[rowi].cells[coli]
+      var cellEl = this.$refs.tbody.rows[rowi].cells[coli + 1]
       this.state.cursor.field = cellEl.getAttribute('data-field')
-      // Focus hack to scroll to right position
-      cellEl.setAttribute('contenteditable', true)
-      cellEl.focus()
-      cellEl.removeAttribute('contenteditable')
 
-      this.$refs.table.focus()
+      // cellEl.setAttribute('contenteditable', true)
+      // cellEl.focus()
+      // cellEl.removeAttribute('contenteditable')
+      // this.$refs.table.focus()
+
+      // Auto scroller
+      var cellRect = cellEl.getBoundingClientRect()
+      var pRect = this.$refs.table.getBoundingClientRect()
+      // relaative to the scroller
+      //
+      const relRect = {
+        top: cellRect.top - pRect.top,
+        left: cellRect.left - pRect.left
+      }
+      // Scrolling operation
+      if (relRect.top > (pRect.height - cellRect.height * 2)) {
+        // Remove excess?
+        const top = (pRect.height - cellRect.height * 2) - relRect.top
+        this.$refs.table.scrollTop -= top
+      }
+      if (relRect.top < cellRect.height * 2) {
+        this.$refs.table.scrollTop += relRect.top - cellRect.height * 2
+      }
+      if (relRect.left > (pRect.width - cellRect.width)) {
+        const left = (pRect.width - cellRect.width) - relRect.left
+        this.$refs.table.scrollLeft -= left
+      }
+      if (relRect.left < cellRect.width) {
+        this.$refs.table.scrollLeft += relRect.left - cellRect.width
+      }
     },
     cursorMove (colm, rowm, circle) {
       // if we have focus, we blur
@@ -274,7 +283,7 @@ export default {
       if (circle) {
         var tEl = this.$refs.tbody
         // Round about
-        if (newColi >= tEl.rows[0].cells.length) {
+        if (newColi >= tEl.rows[0].cells.length - 1) {
           newRowi++
           newColi = 0
         } else if (newColi < 0) {
@@ -288,7 +297,7 @@ export default {
           newRowi = tEl.rows.length - 1
         }
       }
-      newColi = limit(newColi, 0, this.$refs.tbody.rows[0].cells.length - 1)
+      newColi = limit(newColi, 0, this.$refs.tbody.rows[0].cells.length - 2)
       newRowi = limit(newRowi, 0, this.state.rows.length - 1)
       this.cursorSet(newColi, newRowi)
       // Cell Blur and focus

@@ -1,109 +1,86 @@
-:root {
-  --row-height: 40px;
-  --header-height: 30px;
-  --index-width: 30px;
-  --scroll-offset: 12px;
+#table2 {
+  position: relative;
 }
 
-/* testing the thing */
+#table2 .table-container {
+  position: relative;
+  flex: 1 0 100%;
+  min-height: 400px; /* find better way for this */
+  overflow: hidden;
+}
 
-/* fill whatever parent is */
-#table2 {
-  height: 100%;
-  min-height: 400px;
+/* scroll area */
+#table2 table {
+  margin: 10px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: block;
+  overflow: auto;
+}
+
+#table2 thead {
+  display: flex;
+  position: sticky;
+  top: 0;
+  min-width: min-content;
+  min-width: -moz-min-content;
+  z-index: 100;
+}
+
+/* corner */
+#table2 thead .index {
+  z-index: 200;
+}
+
+#table2 .header {
+  z-index: 50;
+}
+
+#table2 tbody {
   display: flex;
   flex-flow: column;
 }
 
-#table2 table {
-  min-height: 400px;
-  width: 100%;
-  display: flex;
-  position: relative;
-  box-sizing: border-box;
-  flex: 1;
-}
-
-#table2 table .corner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 50;
-  width: var(--index-width);
-  height: var(--header-height);
-}
-
-/* we might have a table inside */
 #table2 table tr {
-  height: var(--row-height);
   display: flex;
   flex-flow: row;
-  min-width: fit-content;
-}
-
-#table2 table > tbody > tr > td {
+  min-height: var(--row-height);
   flex: 1;
-  overflow: hidden;
-  display: flex;
-  align-items: flex-start;
+  min-width: min-content;
+  min-width: -moz-min-content;
 }
 
-#table2 table > thead,
-#table2 table > tfoot {
-  overflow: hidden;
-  position: absolute;
-  z-index: 10;
+#table2 table thead tr {
+  min-height: var(--header-height);
 }
 
-#table2 table .corner,
-#table2 table .indexes td,
+#table2 table td,
 #table2 table th {
+  position: relative;
   flex: 1;
+  overflow: hidden;
   display: flex;
-  font-weight: normal;
   align-items: center;
   justify-content: center;
 }
 
-#table2 table > .header > tr > th,
-#table2 table > tbody > tr > td {
-  position: relative;
+#table2 table thead th:not(.index),
+#table2 table tbody td:not(.index) {
   min-width: 200px;
 }
 
-#table2 table > .header {
-  overflow-x: hidden;
-  top: 0;
-  right: var(--scroll-offset);
-  left: var(--index-width);
-}
-
-#table2 table > .header > tr {
-  height: var(--header-height);
-}
-
-/* indexes thing */
-#table2 table > .indexes {
-  overflow-y: hidden;
-  left: 0;
-  top: var(--header-height);
+#table2 table .index {
   user-select: none;
-
-  /* bottom: var(--scroll-offset); */
-  max-height: calc(100% - var(--header-height) - var(--scroll-offset));
-}
-
-#table2 table > .indexes > tr {
+  -moz-user-select: none;
+  -ms-user-select: none;
+  position: sticky;
+  left: 0;
+  min-width: var(--index-width);
+  max-width: var(--index-width);
   width: var(--index-width);
-}
-
-#table2 table tbody {
-  position: absolute;
-  top: var(--header-height);
-  right: 0;
-  left: var(--index-width);
-  overflow: scroll;
-  max-height: calc(100% - var(--header-height));
 }
 
 #table2 table td.active::after {
@@ -115,6 +92,7 @@
   bottom: 0;
   left: 0;
   border: solid 2px rgba(250, 0, 0, 0.2);
+  pointer-events: none;
 }
 
 #table2 table:focus td.active::after {
@@ -147,36 +125,6 @@
   padding: 0;
   margin: 0;
 }
-
-/* #table2 .cursor {
-  box-sizing: border-box;
-  position: absolute;
-  display: none;
-  margin: 0;
-  padding: 0;
-  pointer-events: none;
-
-}
-
-#table2 .cursor .edit {
-  box-sizing: border-box;
-  pointer-events: all;
-  display: none;
-
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 20;
-}
-
-#table2 .cursor .edit input {
-  }
-
-#table2 .cursor.editing .edit {
-  display: block;
-}*/
 
 /* anything inside a td  (usually inputs) */
 #table2 table tbody td > * {

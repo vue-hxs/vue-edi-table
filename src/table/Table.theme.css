@@ -1,18 +1,5 @@
-/* headers */
-#table2 .head {
+#table2 .header {
   background: rgb(238, 238, 238);
-}
-
-#table2 table {
-  margin: 10px;
-}
-
-#table2 table.scrollingTop thead {
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
-}
-
-#table2 table.scrollingLeft .indexes {
-  box-shadow: 2px 0 2px rgba(0, 0, 0, 0.3);
 }
 
 #table2 table td,
@@ -21,7 +8,16 @@
   border-bottom: solid 1px rgba(0, 0, 0, 0.1);
 }
 
-/* header but not index bold */
+/* headers */
+
+#table2 table.scrollingTop thead {
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+#table2 table.scrollingLeft tbody .index {
+  box-shadow: 2px 0 2px rgba(0, 0, 0, 0.3);
+}
+
 #table2 table thead th {
   font-weight: bold;
 }
