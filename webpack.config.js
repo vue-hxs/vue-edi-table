@@ -67,8 +67,8 @@ if (process.env.NODE_ENV === 'development') {
     entry: './demo/main.js',
     output: {
       path: path.resolve(__dirname, './docs'),
-      // publicPath: '/vue-edi-table/',
-      publicPath: '/',
+      publicPath: '/vue-edi-table/',
+      // publicPath: '/',
       filename: 'index.js'
     }
   })
