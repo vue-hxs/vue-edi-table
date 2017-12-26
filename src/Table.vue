@@ -6,10 +6,6 @@
     <div class="actions">
       <button
         v-if="editable"
-        @click="rowAddEvent()"
-      >New</button>
-      <button
-        v-if="editable"
         :disabled="state.historySet.length == 0"
         class="primary-inv"
         @click="changesCommit">save</button>
@@ -24,7 +20,8 @@
       <table
         ref="table"
         tabindex="1"
-        @scroll="scrollEvent"
+        @blur="tableBlur"
+        @scroll="tableScroll"
         :class="{scrollingTop: state.scroll.top > 0, scrollingLeft: state.scroll.left > 0}">
 
         <!-- this is the editor -->
@@ -107,6 +104,11 @@
             </td>
           </tr>
         </tbody>
+        <tfoot v-if="editable">
+          <tr>
+            <td class="add" @click="rowAddEvent">+</td>
+          </tr>
+        </tfoot>
       <!-- not a footer but actually the indexes -->
       </table>
     </div>

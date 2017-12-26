@@ -48,6 +48,10 @@
   min-width: -ms-min-content;
 }
 
+#editable tfoot {
+  display: flex;
+}
+
 #editable table tr {
   display: flex;
   min-width: min-content;
@@ -78,6 +82,20 @@
   left: 0;
 }
 
+#editable table tfoot {
+  position: relative;
+}
+
+#editable table tfoot tr td.add {
+  cursor: pointer;
+  position: sticky;
+  left: 0;
+  bottom: 40px;
+  min-width: 40px;
+  background: #f54;
+  color: #fff;
+}
+
 #editable.editable table td.active::before {
   content: " ";
   z-index: 30;
@@ -99,7 +117,7 @@
   margin: 0;
   padding: 0;
   display: none;
-  box-shadow: 0 4px 20px rgba(50, 50, 50, 0.3);
+  box-shadow: 0 0 10px 2px rgba(50, 50, 50, 0.3);
   z-index: 20;
 }
 

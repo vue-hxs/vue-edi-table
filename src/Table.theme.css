@@ -25,6 +25,7 @@
   height: 40px;
 }
 
+#editable table .add,
 #editable table .index {
   box-sizing: border-box;
   width: 40px;

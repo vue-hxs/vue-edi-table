@@ -1,5 +1,5 @@
 /* row code */
-
+// consider vuex?
 // Data handler
 export default {
   props: {

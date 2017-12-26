@@ -75,7 +75,7 @@ export default {
           if (this.state.cursor.editing) {
             this.editStop(false)
           } else {
-            this.setCursor() // disable cursor
+            this.cursorSet() // disable cursor
           }
           break
         case 'Enter':
@@ -90,7 +90,8 @@ export default {
             }
           }
           break
-        case 'Backspace' || 'Delete':
+        case 'Delete':
+        case 'Backspace':
           if (this.state.cursor.editing) {
             return
           }
@@ -125,7 +126,14 @@ export default {
           }
       }
     },
-    scrollEvent (e) {
+    tableBlur (e) {
+      this.$nextTick(() => {
+        if (document.activeElement !== this.$refs.input) {
+          this.cursorSet()
+        }
+      })
+    },
+    tableScroll (e) {
       this.state.scroll.top = e.currentTarget.scrollTop
       this.state.scroll.left = e.currentTarget.scrollLeft
     },
@@ -134,6 +142,9 @@ export default {
         return false
       }
       var {rowi, field} = this.state.cursor
+      if (rowi === undefined || field === undefined) {
+        return false
+      }
       if (this.state.headers[field].readonly) {
         return false
       }
@@ -152,6 +163,7 @@ export default {
       })
       return true
     },
+    // if val === false we undo the change
     editStop (val) { // or Blur
       if (this.state.cursor.editing === false || this.editable === false) {
         return
@@ -175,7 +187,6 @@ export default {
         return
       }
       this.cursorSet(coli, rowi)
-      // but if cursor is same, we start edit on double click?
     },
     cellChange (rowi, field, value) {
       if (this.editable === false) {
@@ -206,7 +217,7 @@ export default {
 
       this.rowAdd()
       this.$nextTick(() => {
-        console.log('this.state.rows.length', this.state.rows, this.state.rows.length)
+        // TODO: {lpf} improve, use as computed?
         let coli = 0
         for (var k in this.state.headers) {
           if (!this.state.headers[k].readonly) {
@@ -267,9 +278,6 @@ export default {
       if (rowi === undefined && coli === undefined) {
         return false
       }
-
-      console.log('rowi', rowi, this.$refs.tbody.rows.length)
-
       var cellEl = this.$refs.tbody.rows[rowi].cells[coli + 1]
       this.state.cursor.field = cellEl.getAttribute('data-field')
 
@@ -289,7 +297,6 @@ export default {
       }
       // Scrolling operation
       if (relRect.top > (pRect.height - cellRect.height * 2)) {
-        // Remove excess?
         const top = (pRect.height - cellRect.height * 2) - relRect.top
         this.$refs.table.scrollTop -= top
       }
@@ -309,7 +316,6 @@ export default {
       if (this.editable === false) {
         return
       }
-
       // if we have focus, we blur
       let newColi = this.state.cursor.coli + colm
       let newRowi = this.state.cursor.rowi + rowm
