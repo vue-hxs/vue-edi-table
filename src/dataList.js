@@ -2,25 +2,32 @@
 
 // Data handler
 export default {
+  props: {
+    'headers': {type: Object, default: {}},
+    'rows': {type: Array, default: []}
+  },
   data () {
     return {
       state: {
         rows: this.transformRows(this.rows),
         selection: {
           rows: [],
-          last: null
+          lasti: null
         },
-        historySet: []
+        historySet: [],
+        headers: this.headers
       }
     }
   },
   watch: {
     rows (val, oldVal) {
-      this.setRows(val)
+      this.rowsSet(val)
     }
   },
   methods: {
     rowsSet (rows) {
+      this.state.historySet = []
+      this.state.selection.rows = []
       this.state.rows = this.transformRows(rows)
     },
     transformRows (rows) {
@@ -35,7 +42,7 @@ export default {
         this.state.selection.rows.splice(rowi, 1)
         return
       }
-      this.state.selection.last = rowi
+      this.state.selection.lasti = rowi
       this.state.selection.rows.push(this.state.rows[rowi])
       this.state.rows[rowi].selected = true
     },
@@ -55,7 +62,18 @@ export default {
       }
       this.state.selection.rows = []
     },
-
+    rowAdd () {
+      let changes = []
+      var newRow = {}
+      for (var k in this.state.headers) {
+        newRow[k] = this.state.headers[k].default || ''
+      }
+      this.state.rows.push({data: newRow, modified: true})
+      var rowi = this.state.rows.length - 1
+      changes.push({row: this.state.rows[rowi], index: rowi})
+      // this.changeSet.push({op: 'add', row: this.rows[ri].data})
+      this.state.historySet.push({op: 'add', rows: changes})
+    },
     rowDelete (rowList) {
       let changes = []
       for (let row of rowList) {

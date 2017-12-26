@@ -1,12 +1,4 @@
-// import _ from 'lodash'
 import DataList from './dataList'
-
-/*
---row-height: 40px;
-  --header-height: 25px;
-  --index-width: 30px;
-  --scroll-offset: 12px;
-  */
 
 const arrow = {
   // MS Edge stupidity
@@ -18,54 +10,32 @@ const arrow = {
   'ArrowUp': [0, -1],
   'ArrowDown': [0, 1],
   'ArrowRight': [1, 0],
-  'ArrowLeft': [-1, 0]}
-
-var scrollTop = 0
-var scrollLeft = 0
-var scrollTicking = false
+  'ArrowLeft': [-1, 0]
+}
 
 export default {
-  mixins: [DataList],
+  mixins: [DataList], // Extends?
   props: {
-    'headers': {type: Object, default: {}},
-    'rows': {type: Array, default: []},
-
-    'headerHeight': {type: String, default: '40px'},
-    'rowHeight': {type: String, default: '30px'},
-    'indexWidth': {type: String, default: '30px'}
+    'editable': {type: Boolean, default: true}
   },
   data () {
     return {
-      editable: true,
-
       state: {
-        scroll: {
-          top: 0,
-          left: 0
-        },
+        scroll: { top: 0, left: 0 },
         cursor: {
           rowi: 0,
           coli: 0,
           editing: false,
           value: ''
-        },
-
-        headers: this.headers
+        }
       }
     }
   },
-  // Define some styling here?
   mounted () {
-    const scrollSize = getScrollbarWidth()
-    // how compatible is this?
-    this.$el.style.setProperty('--header-height', this.headerHeight)
-    this.$el.style.setProperty('--row-height', this.rowHeight)
-    this.$el.style.setProperty('--index-width', this.indexWidth)
-
-    this.$el.style.setProperty('--scroll-offset', scrollSize + 'px')
-    this.cursorSet() // nothing
+    this.cursorSet()
   },
   methods: {
+    // Should be computed but somehow is not refreshing properly
     editorStyle () {
       const {coli, rowi} = this.state.cursor
       if (!this.state.cursor.editing) {
@@ -74,6 +44,7 @@ export default {
       if (this.$el === undefined || rowi === undefined || coli === undefined) {
         return {display: 'none'}
       }
+      // TODO: verify coli,rowi
       var relRect = this.$refs.table.getBoundingClientRect()
       var rect = this.$refs.tbody.rows[rowi].cells[coli + 1].getBoundingClientRect()
       return {
@@ -89,58 +60,69 @@ export default {
       if (this.editable === false) {
         return
       }
-      // Both
-      if (e.key === 'Tab') {
-        e.preventDefault()
-        this.$refs.input.blur()
-        let dir = 1
-        if (e.shiftKey) dir = -1
-        this.$nextTick(() => {
-          this.cursorMove(dir, 0, true)
-        })
-        return
-      }
-      if (e.key === 'Enter') {
-        if (this.state.cursor.editing) {
-          this.$refs.input.blur() // Stop editing somehow
+      switch (e.key) {
+        case 'Tab':
+          e.preventDefault()
+          this.$refs.input.blur()
+          let dir = 1
+          if (e.shiftKey) dir = -1
           this.$nextTick(() => {
-            this.cursorMove(0, 1)
+            this.cursorMove(dir, 0, true)
           })
-        } else {
-          this.editStart()
-        }
-      }
-      if (e.key === 'Backspace' || e.key === 'Delete') {
-        if (this.state.cursor.editing) {
           return
-        }
-        this.rowChange(this.state.cursor.rowi, this.state.cursor.field, '')
-        // this.state.rows[this.state.cursor.rowi].data[this.state.cursor.field] = ''
-      }
-
-      let dir = arrow[e.key]
-      if (dir !== undefined) {
-        if (this.state.cursor.editing) {
-          return
-        }
-        // move selection and blur whatever is focused
-        // check if we can select further
-        this.cursorMove(dir[0], dir[1], true)
-        e.preventDefault()
-        return
-      }
-      // Single key as a char
-      if (e.key.length === 1) {
-        if (this.state.cursor.editing) {
-          return
-        }
-        e.preventDefault()
-        this.editStart()
-        this.$nextTick(() => {
-          this.state.cursor.value = e.key
-        })
-        // Start edit clear and add this key as a value?
-        // this.state.rows[this.state.cursor.rowi].data[this.state.cursor.field] = e.key
+          // Both
+        case 'Escape':
+          if (this.state.cursor.editing) {
+            this.editStop(false)
+          } else {
+            this.setCursor() // disable cursor
+          }
+          break
+        case 'Enter':
+          if (this.state.cursor.editing) {
+            this.$refs.input.blur() // Stop editing somehow
+            this.$nextTick(() => {
+              this.cursorEnterNext()
+            })
+          } else {
+            if (!this.editStart()) {
+              this.cursorMove(1, 0, true)
+            }
+          }
+          break
+        case 'Backspace' || 'Delete':
+          if (this.state.cursor.editing) {
+            return
+          }
+          this.rowChange(this.state.cursor.rowi, this.state.cursor.field, '')
+          // this.state.rows[this.state.cursor.rowi].data[this.state.cursor.field] = ''
+          break
+        default:
+          let arrowDir = arrow[e.key]
+          if (arrowDir !== undefined) {
+            if (this.state.cursor.editing) {
+              // do nothing
+              return
+            }
+            e.preventDefault()
+            // move selection and blur whatever is focused
+            // check if we can select further
+            this.cursorMove(arrowDir[0], arrowDir[1], true)
+            return
+          }
+          // Single key as a char
+          if (e.key.length === 1) {
+            if (this.state.cursor.editing) {
+              return
+            }
+            e.preventDefault()
+            this.editStart()
+            this.$nextTick(() => {
+              this.state.cursor.value = e.key
+            })
+            // Start edit clear and add this key as a value?
+            // this.state.rows[this.state.cursor.rowi].data[this.state.cursor.field] = e.key
+          }
       }
     },
     scrollEvent (e) {
@@ -148,9 +130,12 @@ export default {
       this.state.scroll.left = e.currentTarget.scrollLeft
     },
     editStart () {
+      if (this.editable === false) {
+        return false
+      }
       var {rowi, field} = this.state.cursor
       if (this.state.headers[field].readonly) {
-        return
+        return false
       }
       this.state.cursor.editing = true
 
@@ -165,24 +150,27 @@ export default {
 
         this.$refs.input.focus()
       })
+      return true
     },
-    editStop (e) { // or Blur
+    editStop (val) { // or Blur
+      if (this.state.cursor.editing === false || this.editable === false) {
+        return
+      }
       this.state.cursor.editing = false
 
       this.$nextTick(() => {
-        var lstyle = this.editorStyle()
-        for (var k in lstyle) {
-          this.$refs.editor.style[k] = lstyle[k]
-        }
-
+        Object.assign(this.$refs.editor.style, this.editorStyle())
         // commit changes
         const {rowi, field} = this.state.cursor
-        this.rowChange(rowi, field, this.state.cursor.value)
+        if (val !== false) this.rowChange(rowi, field, this.state.cursor.value)
         this.$refs.table.focus() // Back to parent focus
       })
     },
     // cellEvents
     cellClick (e, rowi, coli) {
+      if (this.editable === false) {
+        return
+      }
       if (this.state.cursor.editing) {
         return
       }
@@ -190,10 +178,18 @@ export default {
       // but if cursor is same, we start edit on double click?
     },
     cellChange (rowi, field, value) {
+      if (this.editable === false) {
+        return
+      }
+
       this.rowChange(rowi, field, value)
       this.$refs.table.focus()
     },
     cellDblClick (e, rowi, coli) {
+      if (this.editable === false) {
+        return
+      }
+
       if (this.state.cursor.editing) {
         e.preventDefault()
         return
@@ -203,18 +199,40 @@ export default {
       this.editStart()
       // Start edit the cell
     },
+    rowAddEvent (e) {
+      if (this.editable === false) {
+        return
+      }
 
+      this.rowAdd()
+      this.$nextTick(() => {
+        console.log('this.state.rows.length', this.state.rows, this.state.rows.length)
+        let coli = 0
+        for (var k in this.state.headers) {
+          if (!this.state.headers[k].readonly) {
+            break
+          }
+          coli++
+        }
+        this.cursorSet(coli, this.state.rows.length - 1)
+        this.editStart()
+      })
+    },
     // This could be in history
     // Possible improve this into dataList.js
     rowClick (e, rowi) {
+      if (this.editable === false) {
+        return
+      }
+
       e.preventDefault()
       e.stopPropagation()
 
-      if (e.shiftKey && this.state.selection.last !== null) {
+      if (e.shiftKey && this.state.selection.lasti !== null) {
         this.rowDeselectAll()
         // selectRange
         let start = rowi
-        let end = this.state.selection.last
+        let end = this.state.selection.lasti
         this.rowSelectRange(start, end)
         this.$forceUpdate()
         return
@@ -235,11 +253,22 @@ export default {
     },
     // Set the cell/multicell cursor or disable cursor if no arguments
     cursorSet (coli, rowi) {
+      if (this.editable === false) {
+        return
+      }
+
+      // Same as before
+      if (coli === this.state.cursor.coli &&
+        rowi === this.state.cursor.rowi) {
+        return false
+      }
       this.state.cursor.rowi = rowi
       this.state.cursor.coli = coli
       if (rowi === undefined && coli === undefined) {
-        return
+        return false
       }
+
+      console.log('rowi', rowi, this.$refs.tbody.rows.length)
 
       var cellEl = this.$refs.tbody.rows[rowi].cells[coli + 1]
       this.state.cursor.field = cellEl.getAttribute('data-field')
@@ -274,8 +303,13 @@ export default {
       if (relRect.left < cellRect.width) {
         this.$refs.table.scrollLeft += relRect.left - cellRect.width
       }
+      return true
     },
     cursorMove (colm, rowm, circle) {
+      if (this.editable === false) {
+        return
+      }
+
       // if we have focus, we blur
       let newColi = this.state.cursor.coli + colm
       let newRowi = this.state.cursor.rowi + rowm
@@ -299,8 +333,14 @@ export default {
       }
       newColi = limit(newColi, 0, this.$refs.tbody.rows[0].cells.length - 2)
       newRowi = limit(newRowi, 0, this.state.rows.length - 1)
-      this.cursorSet(newColi, newRowi)
+      return this.cursorSet(newColi, newRowi)
       // Cell Blur and focus
+    },
+    cursorEnterNext () {
+      if (!this.cursorMove(0, 1)) {
+        return this.cursorMove(1, 0)
+      }
+      return true
     }
 
   }
@@ -308,29 +348,4 @@ export default {
 
 function limit (val, min, max) {
   return Math.min(Math.max(val, min), max)
-}
-// Helper function to get scrollbar Width
-function getScrollbarWidth () {
-  var outer = document.createElement('div')
-  outer.style.visibility = 'hidden'
-  outer.style.width = '100px'
-  outer.style.msOverflowStyle = 'scrollbar' // needed for WinJS apps
-
-  document.body.appendChild(outer)
-
-  var widthNoScroll = outer.offsetWidth
-  // force scrollbars
-  outer.style.overflow = 'scroll'
-
-  // add innerdiv
-  var inner = document.createElement('div')
-  inner.style.width = '100%'
-  outer.appendChild(inner)
-
-  var widthWithScroll = inner.offsetWidth
-
-  // remove divs
-  outer.parentNode.removeChild(outer)
-
-  return widthNoScroll - widthWithScroll
 }

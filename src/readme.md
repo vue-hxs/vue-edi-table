@@ -11,9 +11,13 @@ Implement history set like other editable
 
 TODO:
 
-* [ ] Fix table dimension to fill parent somehow
-* [ ] Fix focusing on input elements within cells
-* [ ] New row
+* [ ] Improve code, on vue template possibly by using computed or even methods
+      to return data
+* [?] Fix focusing on input elements within cells
+* [-] New row
+  * [ ] new row is done, but commit order should be fixed, on new rows the
+        order should be 'add' last with same info as latest update
+* [x] Fix table dimension to fill parent somehow
 * [x] completelly separate state manipulation methods from events in Table
 * [x] Implement readonly fields
 * [x] Delete

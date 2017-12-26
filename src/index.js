@@ -1,4 +1,3 @@
-import Editable from './editable.vue'
+import Editable from './Table.vue'
 
-
-export {Editable}
+export default Editable

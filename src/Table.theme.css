@@ -1,0 +1,86 @@
+#editable .header {
+  background: #f1f1f1;
+}
+
+#editable .actions {
+  margin: 10px 0;
+}
+
+/*
+#editable table td,
+#editable table th {
+  border-right: solid 1px rgba(0, 0, 0, 0.1);
+  border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+}
+*/
+
+/* headers */
+
+#editable table {
+  outline: none;
+}
+
+#editable table thead,
+#editable table tr {
+  height: 40px;
+}
+
+#editable table .index {
+  box-sizing: border-box;
+  width: 40px;
+  max-width: 40px;
+}
+
+#editable table thead th {
+  font-weight: bold;
+  overflow: hidden;
+}
+
+#editable .editor .input,
+#editable table tbody tr {
+  font: 400 15px Arial, sans-serif;
+  color: #444;
+}
+
+#editable table tbody tr > td > input,
+#editable table tbody tr > td {
+  text-align: center;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+
+#editable .editor .input {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+}
+
+#editable:not(.editable) table tbody tr:hover {
+  background: rgba(150, 150, 150, 0.1);
+}
+
+#editable.editable table td:hover::after {
+  content: " ";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(150, 150, 150, 0.1);
+}
+
+#editable table tr.modified {
+  font-weight: bold;
+  background: #f9f9f9;
+}
+
+#editable table tr.selected > td {
+  background: #ccf;
+}
+
+#editable table tr.modified td.index::before {
+  content: "*";
+}

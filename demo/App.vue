@@ -2,39 +2,31 @@
   <div class="app">
     <div class="controls">
       <button @click="editable=!editable">editable {{ editable }}</button>
-      <input type="text" value="focus test">
     </div>
-
-    <Split :resizeable="true" dir="horizontal">
-      <div>
-        <editable-new
-          :headers="columns"
+    <div class="tables">
+      <Split :resizeable="true" dir="horizontal">
+        <editable
+          :headers="headers"
           :rows="dataList"
           :editable="editable"
           @commit="commit"
-          row-height="40px"
-          index-width="40px"/>
-      </div>
-      <div/>
-      <!--  <div class="old-editable">-->
-      <!--<Editable
-        :columns="columns"
-        :data-list="dataList"
-        :editable="editable"/>-->
-    </Split>
+        />
+        <div/>
+      </Split>
+    </div>
   </div>
 </template>
 <script>
-import {Editable} from '../src'
-import {EditableNew} from '../src/table'
-import {Layout} from 'vue-split-layout'
+import Editable from '../src'
+import {Editable as EditableOld} from '../src/old'
+import {Split} from 'vue-split-layout'
 
 export default {
-  components: {Editable, EditableNew, Layout},
+  components: {Editable, EditableOld, Split},
   data () {
     var dataList = []
 
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 2; i++) {
       dataList.push(
         {id: i * 4 + 1, name: 'Samsung', model: 'Note 4', active: true, password: '123', rdonly: true},
         {id: i * 4 + 2, name: 'Samsung', model: 'Note 5', active: true, password: '123', rdonly: false},
@@ -43,14 +35,8 @@ export default {
       )
     }
     return {
-      splits: {
-        dir: 'horizontal',
-        split: '50%',
-        first: 0,
-        second: 1
-      },
       editable: true,
-      columns: {
+      headers: {
         id: {header: 'Id', text: 'Id', readonly: true},
         name: {header: 'Brands', text: 'Brands'},
         model: {header: 'model', text: 'model'},
@@ -63,7 +49,24 @@ export default {
   },
   methods: {
     commit (c) {
-      console.log('Commiting changes:', c)
+      for (let entry of c) {
+        switch (entry.op) {
+          case 'update':
+            this.dataList.forEach((v, i) => {
+              if (v.id === entry.data.id) {
+                this.$set(this.dataList, i, entry.data)
+              }
+            })
+            break
+          case 'delete':
+            let id = this.dataList.findIndex(d => d.id === entry.data.id)
+            this.dataList.splice(id, 1)
+            break
+          case 'add':
+            this.dataList.push(entry.data)
+            break
+        }
+      }
     }
   }
 }
@@ -75,10 +78,15 @@ body {
   height:100vh;
 }
 .app {
-  position:relative;
+  display:flex;
+  flex-flow:column;
+  background: #f9f9f9;
   height:100%;
 }
-.layout-container {
-  height:100%;
+.tables {
+  flex:1;
+  min-height:400px;
+  display:flex;
+  flex-flow:column;
 }
 </style>

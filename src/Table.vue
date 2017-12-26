@@ -1,6 +1,7 @@
 <template>
   <div
-    id="table2"
+    id="editable"
+    :class="{editable:editable}"
     @keydown="keyEvent">
     <div class="actions">
       <button
@@ -8,6 +9,10 @@
         :disabled="state.historySet.length == 0"
         class="primary-inv"
         @click="changesCommit">save</button>
+      <button
+        v-if="editable"
+        @click="rowAddEvent()"
+      >New</button>
       <button
         v-if="editable && rowHasSelected()"
         @click="rowDelete(state.selection.rows)">Delete selected rows</button>
@@ -21,6 +26,31 @@
         tabindex="1"
         @scroll="scrollEvent"
         :class="{scrollingTop: state.scroll.top > 0, scrollingLeft: state.scroll.left > 0}">
+
+        <!-- this is the editor -->
+        <div
+          v-if="editable"
+          ref="editor"
+          class="editor"
+        >
+          <input
+            v-if="state.cursor.field != undefined && state.headers[state.cursor.field].type == 'checkbox'"
+            class="input"
+            ref="input"
+            type="checkbox"
+            @blur="editStop"
+            v-model="state.cursor.value"
+          >
+          <input
+            v-else
+            class="input"
+            ref="input"
+            :type="state.cursor.field ? state.headers[state.cursor.field].type:''"
+            @blur="editStop"
+            v-model="state.cursor.value"
+          >
+        </div>
+
         <thead ref="thead">
           <tr>
             <th class="index header">#</th>
@@ -43,8 +73,9 @@
             :key="rowi">
             <td
               :class="{header:true, index:true, modified: row.modified, selected: row.selected}"
-              @click="rowClick($event,rowi)"
-            >{{ rowi }}</td>
+              @click="rowClick($event,rowi)">
+              {{ rowi }}
+            </td>
             <td
               v-for="(header, field, coli) in headers"
               v-if="header.visible != false"
@@ -59,14 +90,14 @@
                     type="checkbox"
                     :checked="row.data[field]"
                     @change="cellChange(rowi,field, $event.target.checked)"
-                    :class="{readonly:state.headers[field].readonly}"
+                    :class="{readonly:state.headers[field].readonly || !editable}"
                   >
                 </template>
                 <template v-else-if="header.type != undefined">
                   <input
                     :type="header.type"
                     :value="row.data[field]"
-                    :class="{readonly:state.headers[field].readonly}"
+                    :class="{readonly:state.headers[field].readonly || !editable}"
                     readonly>
                 </template>
                 <template v-else>
@@ -75,46 +106,9 @@
               </template>
             </td>
           </tr>
-          <!-- Maybe a new TR containing the new row here -->
-          <!-- this is the editor -->
-          <div
-            ref="editor"
-            class="editor"
-          >
-            <input
-              v-if="state.cursor.field != undefined && state.headers[state.cursor.field].type == 'checkbox'"
-              class="input"
-              ref="input"
-              type="checkbox"
-              @blur="editStop"
-              v-model="state.cursor.value"
-            >
-            <input
-              v-else
-              class="input"
-              ref="input"
-              :type="state.cursor.field ? state.headers[state.cursor.field].type:''"
-              @blur="editStop"
-              v-model="state.cursor.value"
-            >
-          </div>
-        <!--<div
-          ref="selection"
-          class="selection"
-          :style="selectionStyle">
-          <div class="handle"/>
-        </div>-->
         </tbody>
-        <!-- not a footer but actually the indexes -->
+      <!-- not a footer but actually the indexes -->
       </table>
-    </div>
-    <div class="table-debug">
-      test:
-      {{ state.focus }}
-      <div>
-        <label>HistorySet</label>
-        {{ state.historySet }}
-      </div>
     </div>
 
   </div>
@@ -122,5 +116,5 @@
 
 <script src="./Table.vue.js"/>
 
-<style src="./Table.css"/>
+<style src="./Table.css" scoped></style>
 <style src="./Table.theme.css"></style>

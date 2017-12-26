@@ -1,27 +1,28 @@
-#table2 {
-  position: relative;
+#editable {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
 }
 
-#table2 .table-container {
+#editable .table-container {
+  display: flex;
   position: relative;
-  flex: 1 0 100%;
-  min-height: 400px; /* find better way for this */
-  overflow: hidden;
+  flex: 1;
 }
 
 /* scroll area */
-#table2 table {
-  margin: 10px;
+#editable table {
+  background: #fff;
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  max-height: 100%;
   display: block;
   overflow: auto;
 }
 
-#table2 thead {
+#editable thead {
   display: flex;
   position: sticky;
   top: 0;
@@ -31,59 +32,53 @@
 }
 
 /* corner */
-#table2 thead .index {
+#editable thead .index {
   z-index: 200;
 }
 
-#table2 .header {
+#editable .header {
   z-index: 50;
 }
 
-#table2 tbody {
+#editable tbody {
   display: flex;
   flex-flow: column;
-}
-
-#table2 table tr {
-  display: flex;
-  flex-flow: row;
-  min-height: var(--row-height);
-  flex: 1;
   min-width: min-content;
   min-width: -moz-min-content;
+  min-width: -ms-min-content;
 }
 
-#table2 table thead tr {
-  min-height: var(--header-height);
+#editable table tr {
+  display: flex;
+  min-width: min-content;
+  min-width: -moz-min-content;
+  min-width: -ms-min-content;
+  width: 100%;
 }
 
-#table2 table td,
-#table2 table th {
+#editable table td,
+#editable table th {
   position: relative;
   flex: 1;
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-#table2 table thead th:not(.index),
-#table2 table tbody td:not(.index) {
+#editable table thead th:not(.index),
+#editable table tbody td:not(.index) {
   min-width: 200px;
 }
 
-#table2 table .index {
+#editable table .index {
   user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   position: sticky;
   left: 0;
-  min-width: var(--index-width);
-  max-width: var(--index-width);
-  width: var(--index-width);
 }
 
-#table2 table td.active::after {
+#editable.editable table td.active::before {
   content: " ";
   z-index: 30;
   position: absolute;
@@ -95,11 +90,11 @@
   pointer-events: none;
 }
 
-#table2 table:focus td.active::after {
+#editable.editable table:focus td.active::before {
   border: solid 2px #f00;
 }
 
-#table2 .editor {
+#editable.editable .editor {
   position: absolute;
   margin: 0;
   padding: 0;
@@ -108,12 +103,12 @@
   z-index: 20;
 }
 
-#table2 .editor.editing {
+#editable.editable .editor.editing {
   display: block;
 }
 
 /* Input thing */
-#table2 .editor > .input {
+#editable .editor > .input {
   box-sizing: border-box;
   outline: none;
   background: transparent;
@@ -127,7 +122,7 @@
 }
 
 /* anything inside a td  (usually inputs) */
-#table2 table tbody td > * {
+#editable table tbody td > * {
   overflow: hidden;
   border: none;
   background: transparent;
@@ -139,6 +134,6 @@
   z-index: 20;
 }
 
-#table2 table tbody td > .readonly {
+#editable table tbody td > .readonly {
   pointer-events: none;
 }
