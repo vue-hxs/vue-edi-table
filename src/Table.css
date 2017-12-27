@@ -77,7 +77,6 @@
   justify-content: center;
 }
 
-#editable table thead th:not(.index),
 #editable table tbody td:not(.index) {
   min-width: 200px;
 }
@@ -108,19 +107,20 @@
   pointer-events: none;
 }
 
-#editable.editable table.editing td.active::before {
-  box-shadow: 0 0 10px 2px rgba(50, 50, 50, 0.3);
-}
-
 #editable.editable table.editing td.active::before,
 #editable.editable table:focus td.active::before {
   border: solid 2px #f00;
+}
+
+#editable.editable table.editing td.active::before {
+  box-shadow: 0 0 10px 2px rgba(50, 50, 50, 0.3);
 }
 
 /* anything inside a td  (usually inputs) */
 #editable table tbody td > * {
   box-sizing: border-box;
   border: none;
+  border-radius: none;
   background: transparent;
   margin: 0;
   padding: 0;

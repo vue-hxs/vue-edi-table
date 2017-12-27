@@ -25,8 +25,7 @@
         :class="{scrollingTop: state.scroll.top > 0, scrollingLeft: state.scroll.left > 0,editing:state.cursor.editing}">
         <!-- DATA -->
         <tbody ref="tbody" >
-          <tr
-          class="thead">
+          <tr class="thead">
             <th class="index header">#</th>
             <th
               class="header"
@@ -56,21 +55,15 @@
               :key ="field">
 
               <input
-                v-if="header.type != undefined"
+                v-if="header.type != undefined || cellIsEditing(coli,rowi)"
                 class="input"
                 :type="header.type"
                 :placeholder="header.placeholder"
-                :class="{readonly:state.headers[field].readonly || !editable}"
+                :class="{readonly: fieldIsReadOnly(field)}"
                 v-model="!cellIsEditing(coli,rowi)?row.data[field]:state.cursor.value"
                 @focus="editFocusStart(coli,rowi)"
                 @blur="editStop"
               >
-              <input
-                v-else-if="cellIsEditing(coli,rowi)"
-                class="input"
-                :type="header.type"
-                @blur="editStop"
-                v-model="state.cursor.value">
               <template v-else>
                 {{ row.data[field] }}
               </template>
@@ -79,7 +72,9 @@
         </tbody>
         <tfoot v-if="editable">
           <tr>
-            <td class="add" @click="rowAddEvent">+</td>
+            <td
+              class="add"
+              @click="rowAddEvent">+</td>
           </tr>
         </tfoot>
       <!-- not a footer but actually the indexes -->

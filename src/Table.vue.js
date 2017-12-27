@@ -1,5 +1,4 @@
 import DataList from './dataList'
-import Vue from 'vue'
 
 const arrow = {
   // MS Edge stupidity
@@ -14,13 +13,6 @@ const arrow = {
   'ArrowLeft': [-1, 0]
 }
 
-Vue.directive('focus', {
-  // When the bound element is inserted into the DOM...
-  inserted: function (el) {
-    // Focus the element
-    el.focus()
-  }
-})
 export default {
   mixins: [DataList], // Extends?
   props: {
@@ -60,7 +52,6 @@ export default {
     },
     inputFocus () {
       const el = this.inputEl()
-      console.log('Focusing on:', el)
       if (!el) return
       el.focus()
     },
@@ -78,7 +69,6 @@ export default {
             this.cursorMove(dir, 0, true)
           })
           return
-        // Both
         case 'Escape':
           if (this.state.cursor.editing) {
             this.editStop(false)
@@ -134,7 +124,13 @@ export default {
           }
       }
     },
+    fieldIsReadOnly (field) { // field or header
+      if (!this.editable) return true
+      return this.state.headers[field].readonly
+    },
+
     tableBlur (e) {
+      // TODO: when clicked outside table
       // Find parent
       /* console.log('Table blur')
       let nodeEl = document.activeElement
@@ -151,11 +147,11 @@ export default {
       this.state.scroll.left = e.currentTarget.scrollLeft
     },
     editFocusStart (coli, rowi) {
-      if (this.state.cursor.editing === false) {
-        this.cursorSet(coli, rowi)
-        this.editStart()
+      if (!this.state.cursor.editing) {
+        return
       }
-      // move cursor too rowi,coli
+      this.cursorSet(coli, rowi)
+      this.editStart()
     },
     editStart () {
       if (this.editable === false) {
@@ -207,7 +203,6 @@ export default {
       if (this.state.cursor.editing &&
         this.state.cursor.rowi === rowi &&
       this.state.cursor.coli) {
-        console.log('Current editing, return')
         return
       }
       this.cursorSet(coli, rowi)
@@ -259,13 +254,11 @@ export default {
       if (this.editable === false) {
         return
       }
-
       e.preventDefault()
       e.stopPropagation()
 
       if (e.shiftKey && this.state.selection.lasti !== null) {
         this.rowDeselectAll()
-        // selectRange
         let start = rowi
         let end = this.state.selection.lasti
         this.rowSelectRange(start, end)
@@ -283,10 +276,8 @@ export default {
       }
       this.rowSelect(rowi, true)
 
-      // Why not reactive
       this.$forceUpdate()
     },
-    // Set the cell/multicell cursor or disable cursor if no arguments
     cursorSet (coli, rowi) {
       if (this.editable === false) {
         return
@@ -305,11 +296,6 @@ export default {
       }
       var cellEl = this.cellElAt(coli, rowi)
       this.state.cursor.field = cellEl.getAttribute('data-field')
-
-      // cellEl.setAttribute('contenteditable', true)
-      // cellEl.focus()
-      // cellEl.removeAttribute('contenteditable')
-      // this.$refs.table.focus()
 
       // Auto scroller
       var cellRect = cellEl.getBoundingClientRect()
@@ -347,7 +333,6 @@ export default {
 
       if (circle) {
         var tEl = this.$refs.tbody
-        // Round about
         if (newColi >= tEl.rows[0].cells.length - 1) {
           newRowi++
           newColi = 0
@@ -355,7 +340,6 @@ export default {
           newColi = tEl.rows[0].cells.length - 1
           newRowi--
         }
-        // vertical round
         if (newRowi >= tEl.rows.length) {
           newRowi = 0
         } else if (newRowi < 0) {
@@ -365,7 +349,6 @@ export default {
       newColi = limit(newColi, 0, this.$refs.tbody.rows[0].cells.length - 2)
       newRowi = limit(newRowi, 0, this.state.rows.length - 1)
       return this.cursorSet(newColi, newRowi)
-      // Cell Blur and focus
     },
     cursorEnterNext () {
       if (!this.cursorMove(0, 1)) {
