@@ -1,4 +1,5 @@
 import DataList from './dataList'
+import Vue from 'vue'
 
 const arrow = {
   // MS Edge stupidity
@@ -13,6 +14,13 @@ const arrow = {
   'ArrowLeft': [-1, 0]
 }
 
+Vue.directive('focus', {
+  // When the bound element is inserted into the DOM...
+  inserted: function (el) {
+    // Focus the element
+    el.focus()
+  }
+})
 export default {
   mixins: [DataList], // Extends?
   props: {
@@ -34,28 +42,28 @@ export default {
   mounted () {
     this.cursorSet()
   },
+  filters: {
+    localTime (val) {
+      return new Date(val).toLocaleDateString()
+    }
+  },
   methods: {
-    // Should be computed but somehow is not refreshing properly
-    editorStyle () {
+    inputEl () {
       const {coli, rowi} = this.state.cursor
-      if (!this.state.cursor.editing) {
-        return {display: 'none'}
-      }
-      if (this.$el === undefined || rowi === undefined || coli === undefined) {
-        return {display: 'none'}
-      }
-      // TODO: verify coli,rowi
-      var relRect = this.$refs.table.getBoundingClientRect()
-      var rect = this.$refs.tbody.rows[rowi].cells[coli + 1].getBoundingClientRect()
-      return {
-        display: 'block',
-        left: (rect.left - relRect.left + this.$refs.table.scrollLeft) + 'px',
-        top: (rect.top - relRect.top + this.$refs.table.scrollTop) + 'px',
-        width: rect.width + 'px',
-        height: rect.height + 'px'
-      }
+      if (coli === undefined || rowi === undefined) return
+      return this.cellElAt(coli, rowi).querySelector('.input')
     },
-
+    inputBlur () {
+      const el = this.inputEl()
+      if (!el) return
+      el.blur()
+    },
+    inputFocus () {
+      const el = this.inputEl()
+      console.log('Focusing on:', el)
+      if (!el) return
+      el.focus()
+    },
     keyEvent (e) {
       if (this.editable === false) {
         return
@@ -63,14 +71,14 @@ export default {
       switch (e.key) {
         case 'Tab':
           e.preventDefault()
-          this.$refs.input.blur()
+          this.inputBlur()
           let dir = 1
           if (e.shiftKey) dir = -1
           this.$nextTick(() => {
             this.cursorMove(dir, 0, true)
           })
           return
-          // Both
+        // Both
         case 'Escape':
           if (this.state.cursor.editing) {
             this.editStop(false)
@@ -80,7 +88,7 @@ export default {
           break
         case 'Enter':
           if (this.state.cursor.editing) {
-            this.$refs.input.blur() // Stop editing somehow
+            this.inputBlur() // Stop editing somehow
             this.$nextTick(() => {
               this.cursorEnterNext()
             })
@@ -117,8 +125,8 @@ export default {
               return
             }
             e.preventDefault()
-            this.editStart()
             this.$nextTick(() => {
+              this.editStart() // focus etc
               this.state.cursor.value = e.key
             })
             // Start edit clear and add this key as a value?
@@ -127,15 +135,27 @@ export default {
       }
     },
     tableBlur (e) {
-      this.$nextTick(() => {
-        if (document.activeElement !== this.$refs.input) {
-          this.cursorSet()
-        }
-      })
+      // Find parent
+      /* console.log('Table blur')
+      let nodeEl = document.activeElement
+      for (;nodeEl !== document && nodeEl !== this.$refs.table; nodeEl = nodeEl.parentNode) {
+        console.log('Searching cur:', nodeEl)
+      }
+      if (nodeEl !== this.$refs.table) {
+        console.log('Parent is not a table')
+        this.cursorSet()
+      } */
     },
     tableScroll (e) {
       this.state.scroll.top = e.currentTarget.scrollTop
       this.state.scroll.left = e.currentTarget.scrollLeft
+    },
+    editFocusStart (coli, rowi) {
+      if (this.state.cursor.editing === false) {
+        this.cursorSet(coli, rowi)
+        this.editStart()
+      }
+      // move cursor too rowi,coli
     },
     editStart () {
       if (this.editable === false) {
@@ -149,17 +169,10 @@ export default {
         return false
       }
       this.state.cursor.editing = true
-
       //
       this.state.cursor.value = this.state.rows[rowi].data[field]
       this.$nextTick(() => {
-        // Reposition the thing here computed would be better?
-        var lstyle = this.editorStyle()
-        for (var k in lstyle) {
-          this.$refs.editor.style[k] = lstyle[k]
-        }
-
-        this.$refs.input.focus()
+        this.inputFocus()
       })
       return true
     },
@@ -171,19 +184,30 @@ export default {
       this.state.cursor.editing = false
 
       this.$nextTick(() => {
-        Object.assign(this.$refs.editor.style, this.editorStyle())
+        // Object.assign(this.$refs.editor.style, this.editorStyle())
         // commit changes
         const {rowi, field} = this.state.cursor
         if (val !== false) this.rowChange(rowi, field, this.state.cursor.value)
         this.$refs.table.focus() // Back to parent focus
       })
     },
+    cellIsEditing (coli, rowi) {
+      return this.state.cursor.editing &&
+        this.state.cursor.coli === coli &&
+        this.state.cursor.rowi === rowi
+    },
+    cellElAt (coli, rowi) {
+      return this.$refs.tbody.rows[rowi + 1].cells[coli + 1]
+    },
     // cellEvents
     cellClick (e, rowi, coli) {
       if (this.editable === false) {
         return
       }
-      if (this.state.cursor.editing) {
+      if (this.state.cursor.editing &&
+        this.state.cursor.rowi === rowi &&
+      this.state.cursor.coli) {
+        console.log('Current editing, return')
         return
       }
       this.cursorSet(coli, rowi)
@@ -192,8 +216,8 @@ export default {
       if (this.editable === false) {
         return
       }
-
       this.rowChange(rowi, field, value)
+      this.state.cursor.editing = false
       this.$refs.table.focus()
     },
     cellDblClick (e, rowi, coli) {
@@ -267,6 +291,7 @@ export default {
       if (this.editable === false) {
         return
       }
+      this.state.cursor.editing = false // cancel editing if editing
 
       // Same as before
       if (coli === this.state.cursor.coli &&
@@ -278,7 +303,7 @@ export default {
       if (rowi === undefined && coli === undefined) {
         return false
       }
-      var cellEl = this.$refs.tbody.rows[rowi].cells[coli + 1]
+      var cellEl = this.cellElAt(coli, rowi)
       this.state.cursor.field = cellEl.getAttribute('data-field')
 
       // cellEl.setAttribute('contenteditable', true)

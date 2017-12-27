@@ -2,13 +2,6 @@ vue-edi-table future
 
 Scrollable content
 
-Editable portions,
-optional header types/visibility
-
-Row selection/ Save/delete button
-
-Implement history set like other editable
-
 TODO:
 
 * [ ] Improve code, on vue template possibly by using computed or even methods

@@ -1,7 +1,7 @@
 {
   "name": "vue-edi-table",
   "description": "Editable table",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "dist/vue-edi-table.js",
   "author": "luis <luisf@hexasoftware.com>",
   "license": "MIT",
@@ -11,8 +11,9 @@
     "build-demo": "cross-env NODE_ENV=development webpack --progress --hide-modules"
   },
   "dependencies": {
+    "element-ui": "^2.0.9",
     "vue": "^2.4.4",
-    "vue-split-layout": "^0.0.6"
+    "vue-split-layout": "0.0.6"
   },
   "browserslist": [
     "> 1%",

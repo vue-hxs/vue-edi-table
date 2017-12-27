@@ -27,20 +27,22 @@ export default {
 
     for (let i = 0; i < 2; i++) {
       dataList.push(
-        {id: i * 4 + 1, name: 'Samsung', model: 'Note 4', active: true, password: '123', rdonly: true},
-        {id: i * 4 + 2, name: 'Samsung', model: 'Note 5', active: true, password: '123', rdonly: false},
-        {id: i * 4 + 3, name: 'Apple', model: 'iPhone 4', active: false, password: '123', rdonly: true},
-        {id: i * 4 + 4, name: 'Apple', model: 'iPhone X', active: true, password: '123', rdonly: true}
+        {id: i * 4 + 1, datetime: '', name: 'Samsung', model: 'Note 4', active: true, password: '123', rdonly: true},
+        {id: i * 4 + 2, datetime: '', name: 'Samsung', model: 'Note 5', active: true, password: '123', rdonly: false},
+        {id: i * 4 + 3, datetime: '', name: 'Apple', model: 'iPhone 4', active: false, password: '123', rdonly: true},
+        {id: i * 4 + 4, datetime: '', name: 'Apple', model: 'iPhone X', active: true, password: '123', rdonly: true}
       )
     }
     return {
+      testDateTime: '',
       editable: true,
       headers: {
         id: {header: 'Id', text: 'Id', readonly: true},
+        datetime: {header: 'Datetime', type: 'datetime'},
         name: {header: 'Brands', text: 'Brands'},
         model: {header: 'model', text: 'model'},
         active: {header: 'active', text: 'active', type: 'checkbox'},
-        password: {header: 'Password', text: 'Password', type: 'password'},
+        password: {header: 'Password', text: 'Password', type: 'password', placeholder: 'type password'},
         rdonly: {header: 'Big ass header testing Readonly checkbox', text: 'Big ass header testing Readonly checkbox', type: 'checkbox', readonly: true}
       },
       dataList: dataList

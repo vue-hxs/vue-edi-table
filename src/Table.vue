@@ -22,34 +22,11 @@
         tabindex="1"
         @blur="tableBlur"
         @scroll="tableScroll"
-        :class="{scrollingTop: state.scroll.top > 0, scrollingLeft: state.scroll.left > 0}">
-
-        <!-- this is the editor -->
-        <div
-          v-if="editable"
-          ref="editor"
-          class="editor"
-        >
-          <input
-            v-if="state.cursor.field != undefined && state.headers[state.cursor.field].type == 'checkbox'"
-            class="input"
-            ref="input"
-            type="checkbox"
-            @blur="editStop"
-            v-model="state.cursor.value"
-          >
-          <input
-            v-else
-            class="input"
-            ref="input"
-            :type="state.cursor.field ? state.headers[state.cursor.field].type:''"
-            @blur="editStop"
-            v-model="state.cursor.value"
-          >
-        </div>
-
-        <thead ref="thead">
-          <tr>
+        :class="{scrollingTop: state.scroll.top > 0, scrollingLeft: state.scroll.left > 0,editing:state.cursor.editing}">
+        <!-- DATA -->
+        <tbody ref="tbody" >
+          <tr
+          class="thead">
             <th class="index header">#</th>
             <th
               class="header"
@@ -59,11 +36,7 @@
               {{ header.text == undefined? k: header.text }}
             </th>
           </tr>
-        </thead>
-        <!-- DATA -->
-        <tbody
-          ref="tbody"
-        >
+
           <tr
             v-for="(row,rowi) in state.rows"
             :class="{modified: row.modified, selected: row.selected}"
@@ -81,25 +54,25 @@
               :class="{active:state.cursor.rowi == rowi && state.cursor.coli == coli}"
               :data-field="field"
               :key ="field">
-              <template v-if="!(state.cursor.editing && state.cursor.rowi == rowi && state.cursor.field == field)">
-                <template v-if="header.type == 'checkbox'">
-                  <input
-                    type="checkbox"
-                    :checked="row.data[field]"
-                    @change="cellChange(rowi,field, $event.target.checked)"
-                    :class="{readonly:state.headers[field].readonly || !editable}"
-                  >
-                </template>
-                <template v-else-if="header.type != undefined">
-                  <input
-                    :type="header.type"
-                    :value="row.data[field]"
-                    :class="{readonly:state.headers[field].readonly || !editable}"
-                    readonly>
-                </template>
-                <template v-else>
-                  {{ row.data[field] }}
-                </template>
+
+              <input
+                v-if="header.type != undefined"
+                class="input"
+                :type="header.type"
+                :placeholder="header.placeholder"
+                :class="{readonly:state.headers[field].readonly || !editable}"
+                v-model="!cellIsEditing(coli,rowi)?row.data[field]:state.cursor.value"
+                @focus="editFocusStart(coli,rowi)"
+                @blur="editStop"
+              >
+              <input
+                v-else-if="cellIsEditing(coli,rowi)"
+                class="input"
+                :type="header.type"
+                @blur="editStop"
+                v-model="state.cursor.value">
+              <template v-else>
+                {{ row.data[field] }}
               </template>
             </td>
           </tr>
