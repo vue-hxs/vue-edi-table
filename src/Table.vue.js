@@ -40,18 +40,21 @@ export default {
     }
   },
   methods: {
-    inputEl () {
+    inputFocusable () {
       const {coli, rowi} = this.state.cursor
       if (coli === undefined || rowi === undefined) return
-      return this.cellElAt(coli, rowi).querySelector('.input')
+      const cellEl = this.cellElAt(coli, rowi)
+      const focusable = domQueryFocusable(cellEl)
+
+      return focusable
     },
     inputBlur () {
-      const el = this.inputEl()
+      const el = this.inputFocusable()
       if (!el) return
       el.blur()
     },
     inputFocus () {
-      const el = this.inputEl()
+      const el = this.inputFocusable()
       if (!el) return
       el.focus()
     },
@@ -62,7 +65,7 @@ export default {
       switch (e.key) {
         case 'Tab':
           e.preventDefault()
-          this.inputBlur()
+          this.editStop()
           let dir = 1
           if (e.shiftKey) dir = -1
           this.$nextTick(() => {
@@ -70,6 +73,7 @@ export default {
           })
           return
         case 'Escape':
+          console.log('Escape pressed')
           if (this.state.cursor.editing) {
             this.editStop(false)
           } else {
@@ -78,13 +82,18 @@ export default {
           break
         case 'Enter':
           if (this.state.cursor.editing) {
-            this.inputBlur() // Stop editing somehow
+            this.editStop() // Stop editing somehow
             this.$nextTick(() => {
-              this.cursorEnterNext()
+              if (!this.cursorEnterNext()) {
+                this.rowAddEvent()
+                // New
+              }
             })
           } else {
             if (!this.editStart()) {
-              this.cursorMove(1, 0, true)
+              if (!this.cursorEnterNext()) {
+                this.rowAddEvent()
+              }
             }
           }
           break
@@ -238,6 +247,7 @@ export default {
       this.$nextTick(() => {
         // TODO: {lpf} improve, use as computed?
         let coli = 0
+        // Find first non readonly
         for (var k in this.state.headers) {
           if (!this.state.headers[k].readonly) {
             break
@@ -340,10 +350,10 @@ export default {
           newColi = tEl.rows[0].cells.length - 1
           newRowi--
         }
-        if (newRowi >= tEl.rows.length) {
+        if (newRowi >= tEl.rows.length - 2) {
           newRowi = 0
         } else if (newRowi < 0) {
-          newRowi = tEl.rows.length - 1
+          newRowi = tEl.rows.length - 2
         }
       }
       newColi = limit(newColi, 0, this.$refs.tbody.rows[0].cells.length - 2)
@@ -351,6 +361,10 @@ export default {
       return this.cursorSet(newColi, newRowi)
     },
     cursorEnterNext () {
+      // if current is Readonly
+      if (this.fieldIsReadOnly(this.state.cursor.field)) {
+        return this.cursorMove(1, 0)
+      }
       if (!this.cursorMove(0, 1)) {
         return this.cursorMove(1, 0)
       }
@@ -358,6 +372,27 @@ export default {
     }
 
   }
+}
+function domCanFocus (el) {
+  if (el.matches(':disabled')) {
+    return false
+  }
+  let tabIndex = +el.tabIndex
+  tabIndex = isNaN(tabIndex) ? -1 : tabIndex
+  return el.matches('input,a[href], area[href], iframe') || tabIndex > -1
+}
+
+function domQueryFocusable (node) {
+  if (domCanFocus(node)) {
+    return node
+  }
+  for (let c of Array.from(node.children)) {
+    let n = domQueryFocusable(c)
+    if (n !== undefined) {
+      return n
+    }
+  }
+  return undefined
 }
 
 function limit (val, min, max) {

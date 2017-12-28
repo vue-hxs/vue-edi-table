@@ -26,14 +26,15 @@
       <!-- DATA -->
       <tbody ref="tbody" >
         <tr class="thead">
-          <th class="index header">#</th>
-          <th
+          <td class="index header">#</td>
+          <td
+            v-for="(header,k) in headers"
+            v-if="header.visible != false"
             class="header"
             :key="k"
-            v-for="(header,k) in headers"
-            v-if="header.visible != false">
+            :style="header.style">
             {{ header.text == undefined? k: header.text }}
-          </th>
+          </td>
         </tr>
 
         <tr
@@ -52,22 +53,24 @@
             @dblclick="cellDblClick($event,rowi,coli)"
             :class="{active:state.cursor.rowi == rowi && state.cursor.coli == coli}"
             :data-field="field"
+            :style="header.style"
             :key ="field">
-
             <component
               v-if="header.component"
-              :is="header.component"
-              :class="{input:true,editing:cellIsEditing(coli,rowi),readonly:fieldIsReadOnly(field)}"
+              v-bind="header.props"
               v-model="!cellIsEditing(coli,rowi)?row.data[field]:state.cursor.value"
+              :class="{input:true,editing:cellIsEditing(coli,rowi),readonly:fieldIsReadOnly(field)}"
+              :id="'comp' + field + rowi"
+              :is="header.component"
               @focus="editFocusStart(coli,rowi)"
               @blur="editStop"
             />
             <input
               v-else-if="header.type != undefined || cellIsEditing(coli,rowi)"
+              v-model="!cellIsEditing(coli,rowi)?row.data[field]:state.cursor.value"
               :class="{input:true,editing:cellIsEditing(coli,rowi),readonly:fieldIsReadOnly(field)}"
               :type="header.type"
               :placeholder="header.placeholder"
-              v-model="!cellIsEditing(coli,rowi)?row.data[field]:state.cursor.value"
               @focus="editFocusStart(coli,rowi)"
               @blur="editStop"
             >

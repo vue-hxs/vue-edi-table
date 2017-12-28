@@ -6,53 +6,48 @@
   margin: 10px 0;
 }
 
-#editable table td,
-#editable table th {
+#editable table th,
+#editable table td {
   border-right: solid 1px rgba(0, 0, 0, 0.1);
   border-bottom: solid 1px rgba(0, 0, 0, 0.1);
 }
 
 /* headers */
-
 #editable table {
   outline: none;
 }
 
-#editable table thead,
 #editable table tr {
-  height: 40px;
+  min-height: 40px;
+  font: 400 15px Arial, sans-serif;
+  color: #444;
 }
 
-#editable table .add,
-#editable table .index {
+#editable table tr td.add,
+#editable table tr td.index {
   box-sizing: border-box;
   width: 40px;
   max-width: 40px;
 }
 
-#editable table thead th {
-  font-weight: bold;
-  overflow: hidden;
-}
-
-#editable table tbody tr {
-  font: 400 15px Arial, sans-serif;
-  color: #444;
-}
-
-#editable table tbody tr > td > input,
-#editable table tbody tr > td {
+#editable table tr > td > input,
+#editable table tr > td {
   text-align: center;
   justify-content: center;
   align-content: center;
   align-items: center;
 }
 
-#editable:not(.editable) table tbody tr:hover {
+#editable table tr.thead td {
+  font-weight: bold;
+  overflow: hidden;
+}
+
+#editable:not(.editable) table tr:hover {
   background: rgba(150, 150, 150, 0.1);
 }
 
-#editable.editable table td:hover::after {
+#editable.editable table tr td:hover::after {
   pointer-events: none;
   content: " ";
   position: absolute;

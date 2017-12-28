@@ -40,17 +40,25 @@ export default {
       )
     }
     return {
-      testDateTime: '',
       editable: true,
       headers: {
-        id: {header: 'Id', text: 'Id', readonly: true},
-        child: {header: 'child', component: 'el-date-picker'},
-        datetime: {header: 'Datetime', type: 'datetime'},
-        name: {header: 'Brands', text: 'Brands'},
-        model: {header: 'model', text: 'model'},
-        active: {header: 'active', text: 'active', type: 'checkbox'},
-        password: {header: 'Password', text: 'Password', type: 'password', placeholder: 'type password'},
-        rdonly: {header: 'Big ass header testing Readonly checkbox', text: 'Big ass header testing Readonly checkbox', type: 'checkbox', readonly: true}
+        id: {
+          text: 'Id',
+          style: {'flex': '0 0 40px'},
+          readonly: true
+        },
+        child: {
+          text: 'Custom component',
+          component: 'el-date-picker',
+          props: {'type': 'datetime'},
+          style: {'flex': '2', 'min-width': '200px'}
+        },
+        datetime: {type: 'datetime'},
+        name: {text: 'Brands'},
+        model: {text: 'model'},
+        active: {text: 'active', type: 'checkbox'},
+        password: {text: 'Password', type: 'password', placeholder: 'type password'},
+        rdonly: {text: 'Big ass header testing Readonly checkbox', type: 'checkbox', readonly: true}
       },
       dataList: dataList
     }
@@ -93,8 +101,21 @@ body {
 }
 .tables {
   flex:1;
-  min-height:400px;
+  min-height:calc(100%-40px);
   display:block;
-  max-height:400px;
+  max-height:100%;
+}
+.el-date-editor.el-input {
+  width:100%;
+  margin:4px;
+  padding:0;
+  background:transparent;
+}
+.el-input__inner {
+  background:transparent;
+  border:none;
+  border-radius:0px;
+  margin:0px;
+
 }
 </style>
