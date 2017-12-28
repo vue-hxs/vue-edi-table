@@ -2,15 +2,15 @@ import DataList from './dataList'
 
 const arrow = {
   // MS Edge stupidity
-  'Up': [0, -1],
-  'Down': [0, 1],
-  'Right': [1, 0],
-  'Left': [-1, 0],
+  'Up': [-1, 0],
+  'Down': [1, 0],
+  'Right': [0, 1],
+  'Left': [0, -1],
 
-  'ArrowUp': [0, -1],
-  'ArrowDown': [0, 1],
-  'ArrowRight': [1, 0],
-  'ArrowLeft': [-1, 0]
+  'ArrowUp': [-1, 0],
+  'ArrowDown': [1, 0],
+  'ArrowRight': [0, 1],
+  'ArrowLeft': [0, -1]
 }
 
 export default {
@@ -43,7 +43,7 @@ export default {
     inputFocusable () {
       const {coli, rowi} = this.state.cursor
       if (coli === undefined || rowi === undefined) return
-      const cellEl = this.cellElAt(coli, rowi)
+      const cellEl = this.cellElAt(rowi, coli)
       const focusable = domQueryFocusable(cellEl)
 
       return focusable
@@ -69,7 +69,7 @@ export default {
           let dir = 1
           if (e.shiftKey) dir = -1
           this.$nextTick(() => {
-            this.cursorMove(dir, 0, true)
+            this.cursorMove(0, dir, true)
           })
           return
         case 'Escape':
@@ -102,8 +102,7 @@ export default {
           if (this.state.cursor.editing) {
             return
           }
-          this.rowChange(this.state.cursor.rowi, this.state.cursor.field, '')
-          // this.state.rows[this.state.cursor.rowi].data[this.state.cursor.field] = ''
+          this.rowChange(this.state.cursor.rowi, this.state.cursor.coli, '')
           break
         default:
           let arrowDir = arrow[e.key]
@@ -129,13 +128,12 @@ export default {
               this.state.cursor.value = e.key
             })
             // Start edit clear and add this key as a value?
-            // this.state.rows[this.state.cursor.rowi].data[this.state.cursor.field] = e.key
           }
       }
     },
-    fieldIsReadOnly (field) { // field or header
+    cellIsReadOnly (coli) {
       if (!this.editable) return true
-      return this.state.headers[field].readonly
+      return this.state.headers[coli].readonly
     },
 
     tableBlur (e) {
@@ -159,23 +157,23 @@ export default {
       if (this.state.cursor.editing) {
         return
       }
-      this.cursorSet(coli, rowi)
+      this.cursorSet(rowi, coli)
       this.editStart()
     },
     editStart () {
       if (this.editable === false) {
         return false
       }
-      var {rowi, field} = this.state.cursor
-      if (rowi === undefined || field === undefined) {
+      var {rowi, coli} = this.state.cursor
+      if (rowi === undefined || coli === undefined) {
         return false
       }
-      if (this.state.headers[field].readonly) {
+      if (this.state.headers[coli].readonly) {
         return false
       }
       this.state.cursor.editing = true
       //
-      this.state.cursor.value = this.state.rows[rowi].data[field]
+      this.state.cursor.value = this.state.rows[rowi].data[this.state.headers[coli].field]
       this.$nextTick(() => {
         this.inputFocus()
       })
@@ -191,17 +189,17 @@ export default {
       this.$nextTick(() => {
         // Object.assign(this.$refs.editor.style, this.editorStyle())
         // commit changes
-        const {rowi, field} = this.state.cursor
-        if (val !== false) this.rowChange(rowi, field, this.state.cursor.value)
+        const {rowi, coli} = this.state.cursor
+        if (val !== false) this.rowChange(rowi, coli, this.state.cursor.value)
         this.$refs.table.focus() // Back to parent focus
       })
     },
-    cellIsEditing (coli, rowi) {
+    cellIsEditing (rowi, coli) {
       return this.state.cursor.editing &&
         this.state.cursor.coli === coli &&
         this.state.cursor.rowi === rowi
     },
-    cellElAt (coli, rowi) {
+    cellElAt (rowi, coli) {
       return this.$refs.tbody.rows[rowi + 1].cells[coli + 1]
     },
     // cellEvents
@@ -214,15 +212,7 @@ export default {
       this.state.cursor.coli) {
         return
       }
-      this.cursorSet(coli, rowi)
-    },
-    cellChange (rowi, field, value) {
-      if (this.editable === false) {
-        return
-      }
-      this.rowChange(rowi, field, value)
-      this.state.cursor.editing = false
-      this.$refs.table.focus()
+      this.cursorSet(rowi, coli)
     },
     cellDblClick (e, rowi, coli) {
       if (this.editable === false) {
@@ -233,11 +223,20 @@ export default {
         e.preventDefault()
         return
       }
-      this.cursorSet(coli, rowi)
+      this.cursorSet(rowi, coli)
 
       this.editStart()
       // Start edit the cell
     },
+    cellChange (rowi, coli, value) {
+      if (this.editable === false) {
+        return
+      }
+      this.rowChange(rowi, coli, value)
+      this.state.cursor.editing = false
+      this.$refs.table.focus()
+    },
+
     rowAddEvent (e) {
       if (this.editable === false) {
         return
@@ -254,7 +253,7 @@ export default {
           }
           coli++
         }
-        this.cursorSet(coli, this.state.rows.length - 1)
+        this.cursorSet(this.state.rows.length - 1, coli)
         this.editStart()
       })
     },
@@ -288,7 +287,7 @@ export default {
 
       this.$forceUpdate()
     },
-    cursorSet (coli, rowi) {
+    cursorSet (rowi, coli) {
       if (this.editable === false) {
         return
       }
@@ -304,8 +303,7 @@ export default {
       if (rowi === undefined && coli === undefined) {
         return false
       }
-      var cellEl = this.cellElAt(coli, rowi)
-      this.state.cursor.field = cellEl.getAttribute('data-field')
+      var cellEl = this.cellElAt(rowi, coli)
 
       // Auto scroller
       var cellRect = cellEl.getBoundingClientRect()
@@ -333,7 +331,7 @@ export default {
       }
       return true
     },
-    cursorMove (colm, rowm, circle) {
+    cursorMove (rowm, colm, circle) {
       if (this.editable === false) {
         return
       }
@@ -358,15 +356,15 @@ export default {
       }
       newColi = limit(newColi, 0, this.$refs.tbody.rows[0].cells.length - 2)
       newRowi = limit(newRowi, 0, this.state.rows.length - 1)
-      return this.cursorSet(newColi, newRowi)
+      return this.cursorSet(newRowi, newColi)
     },
     cursorEnterNext () {
       // if current is Readonly
-      if (this.fieldIsReadOnly(this.state.cursor.field)) {
-        return this.cursorMove(1, 0)
+      if (this.cellIsReadOnly(this.state.cursor.coli)) {
+        return this.cursorMove(0, 1)
       }
-      if (!this.cursorMove(0, 1)) {
-        return this.cursorMove(1, 0)
+      if (!this.cursorMove(1, 0)) {
+        return this.cursorMove(0, 1)
       }
       return true
     }

@@ -31,9 +31,9 @@
             v-for="(header,k) in headers"
             v-if="header.visible != false"
             class="header"
-            :key="k"
+            :key="'header-'+k"
             :style="header.style">
-            {{ header.text == undefined? k: header.text }}
+            {{ header.text == undefined? header.field: header.text }}
           </td>
         </tr>
 
@@ -47,35 +47,35 @@
             {{ rowi }}
           </td>
           <td
-            v-for="(header, field, coli) in headers"
+            v-for="(header, coli) in headers"
             v-if="header.visible != false"
             @click="cellClick($event,rowi,coli)"
             @dblclick="cellDblClick($event,rowi,coli)"
             :class="{active:state.cursor.rowi == rowi && state.cursor.coli == coli}"
-            :data-field="field"
             :style="header.style"
-            :key ="field">
+            :key="rowi+'-'+coli">
+
             <component
-              v-if="header.component"
-              v-bind="header.props"
-              v-model="!cellIsEditing(coli,rowi)?row.data[field]:state.cursor.value"
-              :class="{input:true,editing:cellIsEditing(coli,rowi),readonly:fieldIsReadOnly(field)}"
-              :id="'comp' + field + rowi"
-              :is="header.component"
+              v-if="cellIsEditing(rowi,coli) && header.editComponent || header.component"
+              v-bind="(cellIsEditing(rowi,coli) && header.editComponent || header.component).props"
+              v-model="!cellIsEditing(rowi,coli)?row.data[header.field]:state.cursor.value"
+              :class="{input:true,editing:cellIsEditing(rowi,coli),readonly:cellIsReadOnly(coli)}"
+              :id="['comp',rowi,coli].join('-')"
+              :is="(cellIsEditing(rowi,coli) && header.editComponent || header.component).name"
               @focus="editFocusStart(coli,rowi)"
               @blur="editStop"
             />
             <input
-              v-else-if="header.type != undefined || cellIsEditing(coli,rowi)"
-              v-model="!cellIsEditing(coli,rowi)?row.data[field]:state.cursor.value"
-              :class="{input:true,editing:cellIsEditing(coli,rowi),readonly:fieldIsReadOnly(field)}"
+              v-else-if="header.type != undefined || cellIsEditing(rowi,coli)"
+              v-model="!cellIsEditing(rowi,coli)?row.data[header.field]:state.cursor.value"
+              :class="{input:true,editing:cellIsEditing(rowi,coli),readonly:cellIsReadOnly(coli)}"
               :type="header.type"
               :placeholder="header.placeholder"
               @focus="editFocusStart(coli,rowi)"
               @blur="editStop"
             >
             <template v-else>
-              {{ row.data[field] }}
+              {{ row.data[header.field] }}
             </template>
           </td>
         </tr>

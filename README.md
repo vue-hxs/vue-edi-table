@@ -1,15 +1,20 @@
-# editable TODO:
+# vue-edi-table
 
-Excel like edit table
+Excel like table edit
 
-vue-edi-table future
+[https://vue-hxs.github.io/vue-edi-table/](https://vue-hxs.github.io/vue-edi-table/)
 
-Scrollable content
+### TODO:
 
-TODO:
-
-* [ ] Improve code, on vue template possibly by using computed or even methods
+* [ ] Possibly separate rows or cells into independent components
+* [ ] Fidn a way to move .header back to thead since cell size was desynching
+* [ ] Improve code on vue template possibly by using computed or even methods
       to return data
+* [ ] custom operations as sort, filter etc or a simple way to add components to header
+      this way we can set a custom header with controls to manipulate data
+* [ ] lazy loading from an endpoint or list object
+* [x] Transform headers to an array (is currently an object)
+      this way we can present same field twice with different view
 * [x] Fix focusing on input elements within cells
 * [x] New row
   * [x] new row is done, but commit order should be fixed, on new rows the
@@ -24,8 +29,10 @@ TODO:
 * [x] undo with several rows at same time
       usefull for delete 5, undo delete 5
 
-Changes:
+### Changes:
 
 * Changed everything to position:sticky,
 * Scroll is now on table
 * Remove 'div.editor' favouring conditional inputs on 'table td'
+* Reduced complexity
+* Added dynamic optional component for while on editing

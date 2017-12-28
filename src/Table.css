@@ -54,8 +54,6 @@
   position: relative;
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 #editable table tbody tr td.header {
@@ -94,7 +92,7 @@
 }
 
 #editable.editable table.editing tbody tr td.active::before {
-  box-shadow: 0 0 10px 2px rgba(50, 50, 50, 0.3);
+  box-shadow: 0 0 10px 2px rgba(50, 50, 50, 0.4);
 }
 
 /* anything inside a td  (usually inputs) */

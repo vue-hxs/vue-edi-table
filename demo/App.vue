@@ -41,25 +41,38 @@ export default {
     }
     return {
       editable: true,
-      headers: {
-        id: {
+      headers: [
+        {
+          field: 'id', // proper name maybe?
           text: 'Id',
           style: {'flex': '0 0 40px'},
           readonly: true
         },
-        child: {
-          text: 'Custom component',
-          component: 'el-date-picker',
-          props: {'type': 'datetime'},
+        {
+          field: 'datetime',
+          text: 'datetime',
+          component: {
+            name: 'el-date-picker',
+            props: {'type': 'datetime'}
+          },
           style: {'flex': '2', 'min-width': '200px'}
         },
-        datetime: {type: 'datetime'},
-        name: {text: 'Brands'},
-        model: {text: 'model'},
-        active: {text: 'active', type: 'checkbox'},
-        password: {text: 'Password', type: 'password', placeholder: 'type password'},
-        rdonly: {text: 'Big ass header testing Readonly checkbox', type: 'checkbox', readonly: true}
-      },
+        {
+          field: 'datetime',
+          text: 'Same as datetime, but component is on edit only',
+          editComponent: {
+            name: 'el-date-picker',
+            props: {'type': 'datetime'}
+          },
+          style: {'flex': '2', 'min-width': '200px'}
+        },
+        {field: 'name', text: 'Brands'},
+        {field: 'model', text: 'model'},
+        {field: 'active', text: 'active', type: 'checkbox'},
+        {field: 'password', text: 'Password', type: 'password', placeholder: 'type password'},
+        {field: 'rdonly', text: 'Big ass header testing Readonly checkbox', type: 'checkbox', readonly: true},
+        {field: 'weird'}
+      ],
       dataList: dataList
     }
   },

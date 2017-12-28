@@ -3,7 +3,7 @@
 // Data handler
 export default {
   props: {
-    'headers': {type: Object, default: {}},
+    'headers': {type: Array, default: []},
     'rows': {type: Array, default: []}
   },
   data () {
@@ -56,7 +56,6 @@ export default {
       }
     },
     rowDeselectAll () {
-      console.log('Deselecting all')
       for (let row of this.state.selection.rows) {
         row.selected = false
       }
@@ -71,7 +70,7 @@ export default {
       this.state.rows.push({data: newRow, modified: true})
       var rowi = this.state.rows.length - 1
       changes.push({row: this.state.rows[rowi], index: rowi})
-      // this.changeSet.push({op: 'add', row: this.rows[ri].data})
+
       this.state.historySet.push({op: 'add', rows: changes})
     },
     rowDelete (rowList) {
@@ -92,10 +91,11 @@ export default {
       } */
     },
     // Manipulators, mutators whatever?
-    rowChange (rowi, field, newValue) {
-      if (this.state.headers[field].readonly) {
+    rowChange (rowi, coli, newValue) {
+      if (this.state.headers[coli].readonly) {
         return false
       }
+      var field = this.state.headers[coli].field
       if (this.state.rows[rowi].data[field] === newValue) {
         return false
       }
@@ -110,9 +110,6 @@ export default {
           ]
         })
     },
-    /**
-     * Experimental undo
-     */
     // actionsUndo
     changesUndo () {
       var change = this.state.historySet.pop()
