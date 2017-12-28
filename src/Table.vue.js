@@ -115,8 +115,8 @@ export default {
               return
             }
             e.preventDefault()
+            this.editStart() // focus etc
             this.$nextTick(() => {
-              this.editStart() // focus etc
               this.state.cursor.value = e.key
             })
             // Start edit clear and add this key as a value?
@@ -147,7 +147,7 @@ export default {
       this.state.scroll.left = e.currentTarget.scrollLeft
     },
     editFocusStart (coli, rowi) {
-      if (!this.state.cursor.editing) {
+      if (this.state.cursor.editing) {
         return
       }
       this.cursorSet(coli, rowi)

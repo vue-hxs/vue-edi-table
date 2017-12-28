@@ -11,9 +11,7 @@
     "build-demo": "cross-env NODE_ENV=development webpack --progress --hide-modules"
   },
   "dependencies": {
-    "element-ui": "^2.0.9",
-    "vue": "^2.4.4",
-    "vue-split-layout": "0.0.6"
+    "vue": "^2.4.4"
   },
   "browserslist": [
     "> 1%",
@@ -27,6 +25,7 @@
     "babel-preset-stage-3": "^6.24.1",
     "cross-env": "^5.0.5",
     "css-loader": "^0.28.7",
+    "element-ui": "^2.0.9",
     "eslint": "^4.13.1",
     "eslint-config-node": "^2.0.0",
     "eslint-config-standard": "^11.0.0-beta.0",
@@ -39,6 +38,7 @@
     "node-sass": "^4.7.2",
     "sass-loader": "^6.0.6",
     "vue-loader": "^13.0.5",
+    "vue-split-layout": "0.0.8",
     "vue-template-compiler": "^2.4.4",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.9.1"

@@ -19,6 +19,12 @@
 <script>
 import Editable from '../src'
 import {Split} from 'vue-split-layout'
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+import locale from 'element-ui/lib/locale/lang/en'
+import Vue from 'vue'
+
+Vue.use(ElementUI, {locale})
 
 export default {
   components: {Editable, Split},
@@ -38,6 +44,7 @@ export default {
       editable: true,
       headers: {
         id: {header: 'Id', text: 'Id', readonly: true},
+        child: {header: 'child', component: 'el-date-picker'},
         datetime: {header: 'Datetime', type: 'datetime'},
         name: {header: 'Brands', text: 'Brands'},
         model: {header: 'model', text: 'model'},
@@ -87,7 +94,7 @@ body {
 .tables {
   flex:1;
   min-height:400px;
-  display:flex;
-  flex-flow:column;
+  display:block;
+  max-height:400px;
 }
 </style>
