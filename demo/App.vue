@@ -70,7 +70,7 @@ export default {
         {field: 'model', text: 'model'},
         {field: 'active', text: 'active', type: 'checkbox'},
         {field: 'password', text: 'Password', type: 'password', placeholder: 'type password'},
-        {field: 'rdonly', text: 'Big ass header testing Readonly checkbox', type: 'checkbox', readonly: true},
+        {field: 'rdonly', text: 'readonly checkbox', type: 'checkbox', readonly: true},
         {field: 'weird'}
       ],
       dataList: dataList

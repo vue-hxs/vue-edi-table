@@ -79,7 +79,7 @@
             </template>
           </td>
         </tr>
-        <tr>
+        <tr v-if="editable">
           <td
             class="add index"
             @click="rowAddEvent">+</td>
