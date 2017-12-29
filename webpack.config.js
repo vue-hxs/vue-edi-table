@@ -71,7 +71,7 @@ module.exports = {
 
 if (process.env.NODE_ENV === 'development') {
   Object.assign(module.exports, {
-    entry: './demo/main.js',
+    entry: './src/demo/main.js',
     output: {
       path: path.resolve(__dirname, './docs'),
       publicPath: '/vue-edi-table/',
@@ -80,7 +80,7 @@ if (process.env.NODE_ENV === 'development') {
     }
   })
   module.exports.plugins = (module.exports.plugins || []).concat([
-    new HtmlWebpackPlugin({ filename: 'index.html', template: 'demo/index.html' })
+    new HtmlWebpackPlugin({ filename: 'index.html', template: 'src/demo/index.html' })
   ])
 }
 
