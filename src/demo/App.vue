@@ -138,6 +138,7 @@ export default {
   },
   methods: {
     commit (c) {
+      console.log('Commit data:', c)
       for (let entry of c) {
         switch (entry.op) {
           case 'update':

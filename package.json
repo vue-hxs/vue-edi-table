@@ -1,7 +1,7 @@
 {
   "name": "vue-edi-table",
   "description": "Editable table",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "main": "dist/index.js",
   "author": "luis <luisf@hexasoftware.com>",
   "license": "MIT",

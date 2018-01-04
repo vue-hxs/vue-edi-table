@@ -7,7 +7,7 @@ Excel like table edit
 ### TODO:
 
 * [ ] Possibly separate rows or cells into independent components
-* [ ] Fidn a way to move .header back to thead since cell size was desynching
+* [ ] Find a way to move .header back to thead since cell size was desynching
 * [ ] Improve code on vue template possibly by using computed or even methods
       to return data
 * [ ] custom operations as sort, filter etc or a simple way to add components to header

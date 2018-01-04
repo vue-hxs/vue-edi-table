@@ -64,8 +64,8 @@ export default {
     rowAdd () {
       let changes = []
       var newRow = {}
-      for (var k in this.state.headers) {
-        newRow[k] = this.state.headers[k].default || ''
+      for (var h of this.state.headers) {
+        newRow[h.field] = h.default || ''
       }
       this.state.rows.push({data: newRow, modified: true})
       var rowi = this.state.rows.length - 1
