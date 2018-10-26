@@ -1,6 +1,6 @@
 {
   "name": "vue-edi-table",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "main": "dist/vue-edi-table.common.js",
   "author": "luis <luisf@hexasoftware.com>",
   "license": "MIT",
