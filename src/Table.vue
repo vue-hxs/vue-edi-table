@@ -92,7 +92,7 @@
 
 <script src="./Table.vue.js"/>
 
-<style src="./Table.css" module scoped>
+<style src="./Table.css" scoped>
 </style>
 <style src="./Table.theme.css">
 </style>
