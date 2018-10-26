@@ -20,7 +20,6 @@
     <table
       ref="table"
       tabindex="1"
-      @blur="tableBlur"
       @scroll="tableScroll"
       :class="{scrollingTop: state.scroll.top > 0, scrollingLeft: state.scroll.left > 0,editing:state.cursor.editing}">
       <!-- DATA -->
@@ -93,5 +92,7 @@
 
 <script src="./Table.vue.js"/>
 
-<style src="./Table.css" scoped></style>
-<style src="./Table.theme.css"></style>
+<style src="./Table.css" module scoped>
+</style>
+<style src="./Table.theme.css">
+</style>

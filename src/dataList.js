@@ -3,8 +3,8 @@
 // Data handler
 export default {
   props: {
-    'headers': {type: Array, default: []},
-    'rows': {type: Array, default: []}
+    'headers': { type: Array, default: [] },
+    'rows': { type: Array, default: [] }
   },
   data () {
     return {
@@ -31,7 +31,7 @@ export default {
       this.state.rows = this.transformRows(rows)
     },
     transformRows (rows) {
-      return rows.map(row => { return {data: clone(row)} })
+      return rows.map(row => { return { data: clone(row) } })
     },
     rowHasSelected () {
       return this.state.selection.rows.length > 0
@@ -67,11 +67,11 @@ export default {
       for (var h of this.state.headers) {
         newRow[h.field] = h.default || ''
       }
-      this.state.rows.push({data: newRow, modified: true})
+      this.state.rows.push({ data: newRow, modified: true })
       var rowi = this.state.rows.length - 1
-      changes.push({row: this.state.rows[rowi], index: rowi})
+      changes.push({ row: this.state.rows[rowi], index: rowi })
 
-      this.state.historySet.push({op: 'add', rows: changes})
+      this.state.historySet.push({ op: 'add', rows: changes })
     },
     rowDelete (rowList) {
       let changes = []
@@ -80,10 +80,10 @@ export default {
         let vindex = this.state.rows.indexOf(row)
         if (vindex === -1) continue
 
-        changes.push({row: row, index: vindex, oldRow: oldRow})
+        changes.push({ row: row, index: vindex, oldRow: oldRow })
         this.state.rows.splice(vindex, 1)
       }
-      this.state.historySet.push({op: 'delete', rows: changes})
+      this.state.historySet.push({ op: 'delete', rows: changes })
       this.rowDeselectAll()
       // XXX: If auto commit, commit changes here
       /* if (this.autocommit === true) {
@@ -165,7 +165,7 @@ export default {
       var changeSet = []
 
       for (let [row, op] of changeControl) {
-        changeSet.push({op: op, data: row.data})
+        changeSet.push({ op: op, data: row.data })
       }
       this.$emit('commit', changeSet)
     }

@@ -16,7 +16,7 @@ const arrow = {
 export default {
   mixins: [DataList], // Extends?
   props: {
-    'editable': {type: Boolean, default: true}
+    'editable': { type: Boolean, default: true }
   },
   data () {
     return {
@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     inputFocusable () {
-      const {coli, rowi} = this.state.cursor
+      const { coli, rowi } = this.state.cursor
       if (coli === undefined || rowi === undefined) return
       const cellEl = this.cellElAt(rowi, coli)
       const focusable = domQueryFocusable(cellEl)
@@ -73,7 +73,6 @@ export default {
           })
           return
         case 'Escape':
-          console.log('Escape pressed')
           if (this.state.cursor.editing) {
             this.editStop(false)
           } else {
@@ -135,20 +134,6 @@ export default {
       if (!this.editable) return true
       return this.state.headers[coli].readonly
     },
-
-    tableBlur (e) {
-      // TODO: when clicked outside table
-      // Find parent
-      /* console.log('Table blur')
-      let nodeEl = document.activeElement
-      for (;nodeEl !== document && nodeEl !== this.$refs.table; nodeEl = nodeEl.parentNode) {
-        console.log('Searching cur:', nodeEl)
-      }
-      if (nodeEl !== this.$refs.table) {
-        console.log('Parent is not a table')
-        this.cursorSet()
-      } */
-    },
     tableScroll (e) {
       this.state.scroll.top = e.currentTarget.scrollTop
       this.state.scroll.left = e.currentTarget.scrollLeft
@@ -164,7 +149,7 @@ export default {
       if (this.editable === false) {
         return false
       }
-      var {rowi, coli} = this.state.cursor
+      var { rowi, coli } = this.state.cursor
       if (rowi === undefined || coli === undefined) {
         return false
       }
@@ -189,7 +174,7 @@ export default {
       this.$nextTick(() => {
         // Object.assign(this.$refs.editor.style, this.editorStyle())
         // commit changes
-        const {rowi, coli} = this.state.cursor
+        const { rowi, coli } = this.state.cursor
         if (val !== false) this.rowChange(rowi, coli, this.state.cursor.value)
         this.$refs.table.focus() // Back to parent focus
       })
@@ -237,7 +222,7 @@ export default {
       this.$refs.table.focus()
     },
 
-    rowAddEvent (e) {
+    rowAddEvent () {
       if (this.editable === false) {
         return
       }
